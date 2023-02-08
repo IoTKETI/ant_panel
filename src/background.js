@@ -3,8 +3,8 @@
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-const { autoUpdater } = require("electron-updater");
-const log = require('electron-log');
+// const { autoUpdater } = require("electron-updater");
+// const log = require('electron-log');
 //const path = require('path');
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -94,8 +94,8 @@ app.on('ready', async () => {
     }
   }
   createWindow()
-  autoUpdater.autoDownload = true;
-  autoUpdater.checkForUpdates();
+  // autoUpdater.autoDownload = true;
+  // autoUpdater.checkForUpdates();
 })
 
 // Exit cleanly on request from parent process in development mode.

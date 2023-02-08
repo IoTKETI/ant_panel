@@ -1,17 +1,13 @@
 {
-  "name": "hello-world",
+  "name": "ant_panel",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
-    "ota": "concurrently \"node thyme.js --prefix backend\" yarn serve --prefix vuegreen\"",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps",
-    "start": "pm2 start thyme.js --name iitp"
+    "electron:build": "vue-cli-service electron:build"
   },
   "main": "background.js",
   "dependencies": {
@@ -20,8 +16,8 @@
     "bootstrap-vue": "^2.22.0",
     "concurrently": "^7.6.0",
     "core-js": "^3.6.5",
-    "electron-log": "^4.4.1",
-    "electron-updater": "^4.3.9",
+    "electron": "^19.0.8",
+    "electron-devtools-installer": "^3.2.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.40",
     "mqtt": "^4.3.7",
@@ -33,8 +29,7 @@
     "vue-router": "^3.2.0",
     "vue-timers": "^2.0.4",
     "vuetify": "^2.6.14",
-    "vuex": "^3.4.0",
-    "yarn": "^1.22.19"
+    "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -43,8 +38,6 @@
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
-    "electron": "^13.0.0",
-    "electron-devtools-installer": "^3.1.0",
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^7.0.0-beta.4",
     "node-sass": "^7.0.1",
@@ -54,7 +47,8 @@
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-cli-plugin-vuetify": "~2.4.8",
     "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.7.0"
+    "vuetify-loader": "^1.7.0",
+    "webpack": "^4.0.0"
   },
   "eslintConfig": {
     "root": true,
