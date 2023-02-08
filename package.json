@@ -1,13 +1,14 @@
 {
   "name": "ant_panel",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:serve": "vue-cli-service electron:serve",
-    "electron:build": "vue-cli-service electron:build"
+    "electron:build": "vue-cli-service electron:build",
+    "electron:publish": "vue-cli-service electron:build -p always"
   },
   "main": "background.js",
   "dependencies": {
@@ -71,6 +72,6 @@
   ],
   "repository": {
     "type": "github",
-    "url": "https://github.com/jlee7123/dmota.git"
+    "url": "https://github.com/IoTKETI/ant_panel.git"
   }
 }

@@ -26,7 +26,20 @@ module.exports = {
                     oneClick: false,
                     perMachine: true,
                     allowToChangeInstallationDirectory: true
-                }
+                },
+                publish: [
+                    {
+                        provider: "github",
+                        owner: "IoTKETI",
+                        repo: "ant_panel",
+                        vPrefixedTagName: true,
+                        host: "github.com",
+                        releaseType: "release",
+                        channel: "latest",
+                        private: false,
+                        token: process.env.GH_TOKEN
+                    }
+                ]
             }
         }
     }

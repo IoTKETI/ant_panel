@@ -6,20 +6,17 @@ import ant from '../components/ant.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  
-
-  {
-    path: '/',
-    name: '',
-    component: ant
-  },
-
+    {
+        path: '/',
+        name: '',
+        component: ant
+    },
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
 })
 
 export default router

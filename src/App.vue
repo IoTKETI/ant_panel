@@ -1,30 +1,23 @@
 <template>
-  <v-app>
-    <div>
-      <v-spacer></v-spacer>
-    <v-main>
-      <Header></Header>
-      <router-view/>
-      <Footer></Footer>
-    </v-main>
-    </div>
-  </v-app>
+    <v-app>
+        <Header></Header>
+        <Ant></Ant>
+<!--        <router-view/>-->
+    </v-app>
 </template>
 
 <script>
 import Header from './layout/Header';
-import Footer from './layout/Footer';
+import Ant from './components/ant';
 
 export default {
-  name: 'App',
-  components: {
-    Header,
-    Footer,
-  },
+    name: 'App',
+    components: {
+        Header,
+        Ant
+    },
 
-  data: () => ({
-
-  }),
+    data: () => ({}),
 };
 </script>
 
