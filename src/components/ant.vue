@@ -310,12 +310,6 @@ export default {
         },
         createConnection() {
             if (this.client.connected) {
-                console.log(
-                    "DroneInfo",
-                    this.name,
-                    "createConnection",
-                    "destroyConnection"
-                );
                 this.destroyConnection();
             }
 
