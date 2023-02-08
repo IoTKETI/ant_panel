@@ -199,11 +199,8 @@ export default {
         return {
             //location data
             loca_obj: {
-                mLat: "myLatitude",
                 myLatitude: 37.403625,
-                mLon: "myLongitude",
                 myLongitude: 127.161770,
-                mAlt: "myAltitude",
                 myAltitude: 0,
             },
 
@@ -237,22 +234,9 @@ export default {
     },
     methods: {
         sendloca: function () {
+            console.log(JSON.stringify(this.loca_obj));
             this.doPublish(
-                this.motorLocationTopic,
-                "{" +
-                JSON.stringify(this.loca_obj.mLat) +
-                ":" +
-                this.loca_obj.myLatitude +
-                "," +
-                JSON.stringify(this.loca_obj.mLon) +
-                ":" +
-                this.loca_obj.myLongitude +
-                "," +
-                JSON.stringify(this.loca_obj.mAlt) +
-                ":" +
-                this.loca_obj.myAltitude +
-                "}"
-            );
+                this.motorLocationTopic, JSON.stringify(this.loca_obj));
         },
 
         tiltUp: function () {
@@ -261,7 +245,6 @@ export default {
         tiltUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
         },
-
         tiltDown: function () {
             this.doPublish(this.motorControlTopic, "tilt_down");
         },
@@ -321,15 +304,7 @@ export default {
                     if (error) {
                         console.log("Publish error", error);
                     }
-                    console.log("payload:::::  " + payload);
-                });
-            }
-
-            if (this.client.connected) {
-                this.client.publish(topic, payload, 0, (error) => {
-                    if (error) {
-                        console.log("Publish error", error);
-                    }
+                    console.log(topic + " - " + payload);
                 });
             }
         },
