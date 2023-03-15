@@ -1,14 +1,14 @@
 <template>
     <div class="header">
         <v-container>
-            <br/><br/>
+
 
             <v-navigation-drawer
                 fixed
                 right
                 v-model="drawer"
                 :color="color"
-                src="../assets/purple.png"
+                src="../assets/blackwhite.png"
                 :expand-on-hover="expandOnHover"
                 :mini-variant="miniVariant"
                 :top="right"
