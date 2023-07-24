@@ -10,7 +10,12 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import axios from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import Vue2TouchEvents from 'vue2-touch-events'
+import Vue3TouchEvents from "vue3-touch-events";
 
+Vue.use(Vue3TouchEvents);
+
+Vue.use(Vue2TouchEvents)
 Vue.config.productionTip = false
 
 //전역으로 axios 사용하기 위해 추가하는 구문
