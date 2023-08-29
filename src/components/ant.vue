@@ -67,9 +67,9 @@
                             outlined
                             raised
                             elevation="2"
-                            @click="doExit"
+                            @click="doTest"
                         >
-                            <strong class="bt1">EXIT</strong>
+                            <strong class="bt1">TEST</strong>
                         </v-btn>
                     </v-card>
                 </v-col>
@@ -233,19 +233,19 @@
                 </v-col>
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
-                        <v-btn
-                            class="b0"
-                            color="white"
-                            x-large
-                            block
-                            outlined
-                            raised
-                            elevation="2"
-                            @click="doTest"
-                        >
-                            <strong class="bt1">TEST</strong>
-                        </v-btn>
-                        <br/>
+<!--                        <v-btn-->
+<!--                            class="b0"-->
+<!--                            color="white"-->
+<!--                            x-large-->
+<!--                            block-->
+<!--                            outlined-->
+<!--                            raised-->
+<!--                            elevation="2"-->
+<!--                            @click="doTest"-->
+<!--                        >-->
+<!--                            <strong class="bt1">TEST</strong>-->
+<!--                        </v-btn>-->
+<!--                        <br/>-->
 
                         <v-btn
                             class="b0"
@@ -527,10 +527,7 @@ export default {
         doArrange: function () {
             this.doPublish(this.motorControlTopic, "arrange");
         },
-        doExit: () => {
-            this.doPublish(this.motorControlTopic, "exit");
-        },
-        doTest: () => {
+        doTest: function () {
             this.doPublish(this.motorControlTopic, "test");
         },
         setbtn: function () {
@@ -547,8 +544,8 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                //this.connection.host = "127.0.0.1";
-                this.connection.host = "gcs.iotocean.org";
+                this.connection.host = "127.0.0.1";
+                //this.connection.host = "gcs.iotocean.org";
 
                 //this.connection.host = data.host;
                 //this.connection.host = data.gcs_ip.split('.')[0] + '.' + data.gcs_ip.split('.')[1] + '.' + data.gcs_ip.split('.')[2] + '.100';
