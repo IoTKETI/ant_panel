@@ -53,9 +53,9 @@
                             outlined
                             raised
                             elevation="2"
-                            @click="doInit"
+                            @click="doArrange"
                         >
-                            <strong class="bt1">INIT</strong>
+                            <strong class="bt1">ARRANGE</strong>
                         </v-btn>
                         <br/>
 
@@ -524,8 +524,8 @@ export default {
         doRun: function () {
             this.doPublish(this.motorControlTopic, "run");
         },
-        doInit: function () {
-            this.doPublish(this.motorControlTopic, "init");
+        doArrange: function () {
+            this.doPublish(this.motorControlTopic, "arrange");
         },
         doExit: () => {
             this.doPublish(this.motorControlTopic, "exit");
