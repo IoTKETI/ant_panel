@@ -465,14 +465,14 @@ export default {
             },
 
             getDataTopic: {
-                pan: "/Ant_Tracker/Motor_Pan",
-                tilt: "/Ant_Tracker/Motor_Tilt",
+                pan: "/Mobius/GcsName/Tr_Data/pan",
+                tilt: "/Mobius/GcsName/Tr_Data/tilt",
             },
 
-            motorControlTopic: "/Panel/Tracker/control",
-            altTopic: "/Panel/Tracker/altitude",
+            motorControlTopic: "/Mobius/GcsName/Ctrl_Data/Panel",
+            altTopic: "/Mobius/GcsName/Alt_Data/Panel",
 
-            droneTopic: "/Ant_Tracker/drone_info",
+            droneTopic: "/Mobius/GcsName/Drinfo_Data/Panel",
 
             console_text_message: "",
             chk: "",
@@ -544,7 +544,18 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                this.connection.host = "127.0.0.1";
+                //this.connection.host = "192.168.202.120";
+                this.connection.host = "gcs.iotocean.org";
+                this.connection.gcs = "KETI_GCS";
+
+                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/pan";
+                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/tilt";
+
+                this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/Panel";
+                this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/Panel";
+                this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/Panel";
+                this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/Panel";
+
                 //this.connection.host = "gcs.iotocean.org";
 
                 //this.connection.host = data.host;
