@@ -169,34 +169,62 @@
             <v-row>
                 <v-col>
                     <br/>
-
                     <v-card class="v1" outlined color="transparent">
                         <v-row>
-                            <v-col>
-                                <p class="f1 font-weight-black">Altitude :</p>
-                                <v-text-field
-                                    class="text-white"
-                                    v-model="altset"
-                                    :rules="altset_rule"
-                                    label=""
-                                    variant="outlined"
-                                    color="white"
-                                >
-                                </v-text-field>
-
-                                <v-btn
-                                    class="bb"
-                                    color="white"
-                                    x-large
-                                    block
-                                    outlined
-                                    raised
-                                    elevation="2"
-                                    @click="setbtn"
-                                >
-                                    <strong class="bt1">SET</strong>
-                                </v-btn>
-                            </v-col>
+                            <p class="f3 mt-n4 font-weight-black">HOST :</p>
+                        </v-row>
+                        <v-row>
+                            <v-text-field
+                                class="text-white mt-n6"
+                                v-model="connection.host"
+                                :rules="host_rule"
+                                label=""
+                                color="white"
+                                style="font-size: 3px"
+                            >
+                            </v-text-field>
+                        </v-row>
+                        <v-row>
+                            <p class="f3 font-weight-black">GCS :</p>
+                        </v-row>
+                        <v-row>
+                            <v-text-field
+                                class="text-white mt-n6"
+                                v-model="connection.gcs"
+                                :rules="gcs_rule"
+                                label=""
+                                color="white"
+                                style="font-size: 3px"
+                            >
+                            </v-text-field>
+                        </v-row>
+                        <v-row>
+                            <v-btn
+                                v-if="!client.connected"
+                                class="bb"
+                                color="white"
+                                x-large
+                                block
+                                outlined
+                                raised
+                                elevation="2"
+                                @click="setbtn"
+                            >
+                                <strong class="bt1">connect</strong>
+                            </v-btn>
+                            <v-btn
+                                v-if="client.connected"
+                                class="bb"
+                                color="white"
+                                x-large
+                                block
+                                outlined
+                                raised
+                                elevation="2"
+                                @click="destroyConnection"
+                            >
+                                <strong class="bt1">disconnect</strong>
+                            </v-btn>
                         </v-row>
                     </v-card>
                 </v-col>
@@ -233,19 +261,19 @@
                 </v-col>
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
-<!--                        <v-btn-->
-<!--                            class="b0"-->
-<!--                            color="white"-->
-<!--                            x-large-->
-<!--                            block-->
-<!--                            outlined-->
-<!--                            raised-->
-<!--                            elevation="2"-->
-<!--                            @click="doTest"-->
-<!--                        >-->
-<!--                            <strong class="bt1">TEST</strong>-->
-<!--                        </v-btn>-->
-<!--                        <br/>-->
+                        <!--                        <v-btn-->
+                        <!--                            class="b0"-->
+                        <!--                            color="white"-->
+                        <!--                            x-large-->
+                        <!--                            block-->
+                        <!--                            outlined-->
+                        <!--                            raised-->
+                        <!--                            elevation="2"-->
+                        <!--                            @click="doTest"-->
+                        <!--                        >-->
+                        <!--                            <strong class="bt1">TEST</strong>-->
+                        <!--                        </v-btn>-->
+                        <!--                        <br/>-->
 
                         <v-btn
                             class="b0"
@@ -266,122 +294,122 @@
 
         <br/><br/>
 
-        <div>
-            <v-card
-                class="pa-10 white--text"
-                outlined
-                shaped
-                elevation="3"
-                color="white"
-            >
-                <v-row>
-                    <v-col>
-                        <p class="f0 font-weight-black">Drone Information</p>
-                    </v-col>
-                    <v-col cols=""></v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="">
-                        <v-text-field
-                            class="black--text"
-                            label="ID :"
-                            v-model="drone_info.id"
-                            :rules="id_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
+        <!--        <div>-->
+        <!--            <v-card-->
+        <!--                class="pa-10 white&#45;&#45;text"-->
+        <!--                outlined-->
+        <!--                shaped-->
+        <!--                elevation="3"-->
+        <!--                color="white"-->
+        <!--            >-->
+        <!--                <v-row>-->
+        <!--                    <v-col>-->
+        <!--                        <p class="f0 font-weight-black">Drone Information</p>-->
+        <!--                    </v-col>-->
+        <!--                    <v-col cols=""></v-col>-->
+        <!--                </v-row>-->
+        <!--                <v-row>-->
+        <!--                    <v-col cols="">-->
+        <!--                        <v-text-field-->
+        <!--                            class="black&#45;&#45;text"-->
+        <!--                            label="ID :"-->
+        <!--                            v-model="drone_info.id"-->
+        <!--                            :rules="id_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
 
-                        <v-text-field
-                            class="text-black"
-                            label="DRONE :"
-                            v-model="drone_info.drone"
-                            :rules="drone_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="DRONE :"-->
+        <!--                            v-model="drone_info.drone"-->
+        <!--                            :rules="drone_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
 
-                        <v-text-field
-                            class="text-black"
-                            label="HOST :"
-                            v-model="drone_info.host"
-                            :rules="host_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="HOST :"-->
+        <!--                            v-model="drone_info.host"-->
+        <!--                            :rules="host_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
 
-                        <v-text-field
-                            class="text-black"
-                            label="GCS :"
-                            v-model="drone_info.gcs"
-                            :rules="gcs_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
-                    </v-col>
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="GCS :"-->
+        <!--                            v-model="drone_info.gcs"-->
+        <!--                            :rules="gcs_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
+        <!--                    </v-col>-->
 
-                    <v-col cols="">
-                        <v-text-field
-                            class="text-black"
-                            label="TYPE :"
-                            v-model="drone_info.type"
-                            :rules="type_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
-                        <v-text-field
-                            class="text-black"
-                            label="SYSTEM ID :"
-                            v-model="drone_info.systemid"
-                            :rules="systemid_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
-                        <v-text-field
-                            class="text-black"
-                            label="GCS IP :"
-                            v-model="drone_info.gcsip"
-                            :rules="gcsip_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
-                        <v-text-field
-                            class="text-black"
-                            label="KCMVP :"
-                            v-model="drone_info.kcmvp"
-                            :rules="kcmvp_rule"
-                            model-value=""
-                            prefix=" "
-                            color="black"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-                <br/>
-                <v-row>
-                    <v-col></v-col>
-                    <v-col>
-                        <v-btn
-                            class="sb"
-                            x-large
-                            block
-                            outlined
-                            raised
-                            elevation="2"
-                            @click="savebtn"
-                        >
-                            <strong class="bt0">SAVE</strong>
-                        </v-btn>
-                    </v-col>
-                    <v-col></v-col>
-                </v-row>
-            </v-card>
-        </div>
+        <!--                    <v-col cols="">-->
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="TYPE :"-->
+        <!--                            v-model="drone_info.type"-->
+        <!--                            :rules="type_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="SYSTEM ID :"-->
+        <!--                            v-model="drone_info.systemid"-->
+        <!--                            :rules="systemid_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="GCS IP :"-->
+        <!--                            v-model="drone_info.gcsip"-->
+        <!--                            :rules="gcsip_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
+        <!--                        <v-text-field-->
+        <!--                            class="text-black"-->
+        <!--                            label="KCMVP :"-->
+        <!--                            v-model="drone_info.kcmvp"-->
+        <!--                            :rules="kcmvp_rule"-->
+        <!--                            model-value=""-->
+        <!--                            prefix=" "-->
+        <!--                            color="black"-->
+        <!--                        ></v-text-field>-->
+        <!--                    </v-col>-->
+        <!--                </v-row>-->
+        <!--                <br/>-->
+        <!--                <v-row>-->
+        <!--                    <v-col></v-col>-->
+        <!--                    <v-col>-->
+        <!--                        <v-btn-->
+        <!--                            class="sb"-->
+        <!--                            x-large-->
+        <!--                            block-->
+        <!--                            outlined-->
+        <!--                            raised-->
+        <!--                            elevation="2"-->
+        <!--                            @click="savebtn"-->
+        <!--                        >-->
+        <!--                            <strong class="bt0">SAVE</strong>-->
+        <!--                        </v-btn>-->
+        <!--                    </v-col>-->
+        <!--                    <v-col></v-col>-->
+        <!--                </v-row>-->
+        <!--            </v-card>-->
+        <!--        </div>-->
     </v-container>
 </template>
 
@@ -450,11 +478,9 @@ export default {
                 loading: false,
             },
             connection: {
-                //host: "127.0.0.1",
-                //host: data.host,
-                host: "",
+                host: localStorage.getItem('mobius-host'),
+                gcs: localStorage.getItem('mobius-gcs'),
                 port: 8883,
-                //port: 1883,
                 endpoint: "",
                 clean: true,
                 connectTimeout: 4000,
@@ -531,11 +557,14 @@ export default {
             this.doPublish(this.motorControlTopic, "test");
         },
         setbtn: function () {
-            this.doPublish(this.altTopic, this.altset);
+            // this.doPublish(this.altTopic, this.altset);
+            localStorage.setItem('mobius-host', this.connection.host);
+            localStorage.setItem('mobius-gcs', this.connection.gcs);
+
+            this.createConnection();
         },
 
         createConnection() {
-            console.log("createConnection () 시작!");
             if (this.client.connected) {
                 this.destroyConnection();
             }
@@ -544,9 +573,9 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                //this.connection.host = "192.168.202.120";
-                this.connection.host = "gcs.iotocean.org";
-                this.connection.gcs = "KETI_GCS";
+                // this.connection.host = "192.168.201.120";
+                // this.connection.host = "gcs.iotocean.org";
+                // this.connection.gcs = "KETI_GCS";
 
                 this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/pan";
                 this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/tilt";
@@ -696,7 +725,7 @@ export default {
                         connected: false,
                         loading: false,
                     };
-                    console.log(this.name, "Successfully disconnected!");
+                    console.log(this.connection.host + ' - ' + this.connection.gcs, "\nSuccessfully disconnected!");
                 }
                 catch (error) {
                     console.log("Disconnect failed", error.toString());
@@ -705,12 +734,10 @@ export default {
         },
     },
     created() {
-        console.log("created () 시작!");
-        this.createConnection();
+        // this.createConnection();
     },
 
     mounted() {
-        console.log("mounted () 시작!");
 
         this.interval = setInterval(() => {
             if (this.value === 100) {
@@ -747,7 +774,6 @@ export default {
 .f0 {
     text-align: left;
     color: black;
-    font-weight: black;
     letter-spacing: 3px;
     font-size: 20px;
 }
@@ -755,7 +781,6 @@ export default {
 .f1 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 20px;
 }
@@ -763,7 +788,6 @@ export default {
 .f2 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 8px;
     font-size: 20px;
 }
@@ -771,23 +795,20 @@ export default {
 .f3 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 3px;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .f4 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 3px;
-    font-size: 32px;
+    font-size: 10px;
 }
 
 .bt0 {
     text-align: center;
     color: black;
-    font-weight: black;
     letter-spacing: 2px;
     font-size: 15px;
 }
@@ -795,7 +816,6 @@ export default {
 .bt1 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
 }
@@ -803,7 +823,6 @@ export default {
 .bt2 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
     transform: rotate(90deg);
@@ -812,7 +831,6 @@ export default {
 .bt3 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
     transform: rotate(270deg);
@@ -835,7 +853,6 @@ export default {
 
 .sb {
     color: black;
-    font-weight: black;
     width: 50px;
     min-width: 50px;
     height: 50px;
@@ -872,5 +889,9 @@ export default {
     max-width: 200px;
     min-height: 200px;
     max-height: 200px;
+}
+
+.v-text-field input {
+    font-size: 7em;
 }
 </style>
