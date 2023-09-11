@@ -171,7 +171,7 @@
                     <br/>
                     <v-card class="v1" outlined color="transparent">
                         <v-row>
-                            <p class="f3 mt-n4 font-weight-black">HOST :</p>
+                            <p class="f3 mt-n5 font-weight-black" style="font-size: 17px">HOST :</p>
                         </v-row>
                         <v-row>
                             <v-text-field
@@ -180,12 +180,11 @@
                                 :rules="host_rule"
                                 label=""
                                 color="white"
-                                style="font-size: 3px"
                             >
                             </v-text-field>
                         </v-row>
                         <v-row>
-                            <p class="f3 font-weight-black">GCS :</p>
+                            <p class="f3 font-weight-black mt-n3" style="font-size: 17px">GCS :</p>
                         </v-row>
                         <v-row>
                             <v-text-field
@@ -194,37 +193,39 @@
                                 :rules="gcs_rule"
                                 label=""
                                 color="white"
-                                style="font-size: 3px"
                             >
                             </v-text-field>
                         </v-row>
-                        <v-row>
-                            <v-btn
-                                v-if="!client.connected"
-                                class="bb"
-                                color="white"
-                                x-large
-                                block
-                                outlined
-                                raised
-                                elevation="2"
-                                @click="setbtn"
-                            >
-                                <strong class="bt1">connect</strong>
-                            </v-btn>
-                            <v-btn
-                                v-if="client.connected"
-                                class="bb"
-                                color="white"
-                                x-large
-                                block
-                                outlined
-                                raised
-                                elevation="2"
-                                @click="destroyConnection"
-                            >
-                                <strong class="bt1">disconnect</strong>
-                            </v-btn>
+                        <v-row class="mt-n6">
+                            <v-col>
+                                <v-btn
+                                    v-if="!client.connected"
+                                    class="bb"
+                                    color="white"
+                                    x-large
+                                    block
+                                    outlined
+                                    raised
+
+                                    elevation="2"
+                                    @click="setbtn"
+                                >
+                                    <strong class="bt1">connect</strong>
+                                </v-btn>
+                                <v-btn
+                                    v-if="client.connected"
+                                    class="bb"
+                                    color="white"
+                                    x-large
+                                    block
+                                    outlined
+                                    raised
+                                    elevation="2"
+                                    @click="destroyConnection"
+                                >
+                                    <strong class="bt1">disconnect</strong>
+                                </v-btn>
+                            </v-col>
                         </v-row>
                     </v-card>
                 </v-col>
@@ -491,8 +492,8 @@ export default {
             },
 
             getDataTopic: {
-                pan: "/Mobius/GcsName/Tr_Data/pan",
-                tilt: "/Mobius/GcsName/Tr_Data/tilt",
+                pan: "/Mobius/GcsName/Tr_Data/+/pan",
+                tilt: "/Mobius/GcsName/Tr_Data/+/tilt",
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/Panel",
@@ -577,8 +578,8 @@ export default {
                 // this.connection.host = "gcs.iotocean.org";
                 // this.connection.gcs = "KETI_GCS";
 
-                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/pan";
-                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/tilt";
+                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/+/pan";
+                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/+/tilt";
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/Panel";
@@ -636,8 +637,9 @@ export default {
                     this.client.on("message", (topic, message) => {
                         console.log("Received " + message.toString() + " From " + topic);
 
-                        if (topic === this.getDataTopic.pan) {
-                            this.myPan = parseInt(message.toString()).toFixed(1);
+                        let topic_arr = topic.split('/');
+                        if (topic_arr[topic_arr.length - 1] === 'pan') {
+                            this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myPan = parseInt(this.myPan);
 
                             if (this.myPan > 0) {
@@ -652,8 +654,8 @@ export default {
                                 this.pPan = 0;
                             }
                         }
-                        else if (topic === this.getDataTopic.tilt) {
-                            this.myTilt = parseInt(message.toString()).toFixed(1);
+                        else if (topic_arr[topic_arr.length - 1] === 'tilt') {
+                            this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myTilt = parseInt(this.myTilt);
 
                             if (this.myTilt > 0) {
@@ -892,6 +894,6 @@ export default {
 }
 
 .v-text-field input {
-    font-size: 7em;
+    font-size: 15px;
 }
 </style>
