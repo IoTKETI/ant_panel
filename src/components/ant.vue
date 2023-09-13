@@ -492,8 +492,8 @@ export default {
             },
 
             getDataTopic: {
-                pan: "/Mobius/GcsName/Tr_Data/+/pan",
-                tilt: "/Mobius/GcsName/Tr_Data/+/tilt",
+                pan: "/Mobius/GcsName/Tr_Data/pan",
+                tilt: "/Mobius/GcsName/Tr_Data/tilt",
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/Panel",
@@ -578,8 +578,8 @@ export default {
                 // this.connection.host = "gcs.iotocean.org";
                 // this.connection.gcs = "KETI_GCS";
 
-                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/+/pan";
-                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/+/tilt";
+                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/pan";
+                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/tilt";
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/Panel";
