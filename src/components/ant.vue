@@ -196,6 +196,19 @@
                             >
                             </v-text-field>
                         </v-row>
+                        <v-row>
+                            <p class="f3 font-weight-black mt-n3" style="font-size: 17px">Drone :</p>
+                        </v-row>
+                        <v-row>
+                            <v-text-field
+                                class="text-white mt-n6"
+                                v-model="connection.drone"
+                                :rules="drone_rule"
+                                label=""
+                                color="white"
+                            >
+                            </v-text-field>
+                        </v-row>
                         <v-row class="mt-n6">
                             <v-col>
                                 <v-btn
@@ -479,25 +492,27 @@ export default {
                 loading: false,
             },
             connection: {
-                host: localStorage.getItem('mobius-host'),
-                gcs: localStorage.getItem('mobius-gcs'),
+                host: localStorage.getItem('mobius-host') ? localStorage.getItem('mobius-host'): '',
+                gcs: localStorage.getItem('mobius-gcs') ? localStorage.getItem('mobius-gcs'): '',
+                drone: localStorage.getItem('mobius-drone') ? localStorage.getItem('mobius-drone'): '',
                 port: 8883,
                 endpoint: "",
                 clean: true,
-                connectTimeout: 4000,
-                reconnectPeriod: 4000,
+                reconnectPeriod: 2 * 1000,
+                connectTimeout: 30 * 1000,
+                queueQoSZero: false,
                 clientId: "jiho_" + nanoid(15),
                 username: "keti_muv",
                 password: "keti_muv",
             },
 
             getDataTopic: {
-                pan: "/Mobius/GcsName/Tr_Data/pan",
-                tilt: "/Mobius/GcsName/Tr_Data/tilt",
+                pan: "/Mobius/GcsName/Tr_Data/DroneName/pan",
+                tilt: "/Mobius/GcsName/Tr_Data/DroneName/tilt",
             },
 
-            motorControlTopic: "/Mobius/GcsName/Ctrl_Data/Panel",
-            altTopic: "/Mobius/GcsName/Alt_Data/Panel",
+            motorControlTopic: "/Mobius/GcsName/Ctrl_Data/DroneName/Panel",
+            altTopic: "/Mobius/GcsName/Alt_Data/DroneName/Panel",
 
             droneTopic: "/Mobius/GcsName/Drinfo_Data/Panel",
 
@@ -561,6 +576,7 @@ export default {
             // this.doPublish(this.altTopic, this.altset);
             localStorage.setItem('mobius-host', this.connection.host);
             localStorage.setItem('mobius-gcs', this.connection.gcs);
+            localStorage.setItem('mobius-drone', this.connection.drone);
 
             this.createConnection();
         },
@@ -578,12 +594,11 @@ export default {
                 // this.connection.host = "gcs.iotocean.org";
                 // this.connection.gcs = "KETI_GCS";
 
-                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/pan";
-                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/tilt";
+                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pan";
+                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/tilt";
 
-                this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/Panel";
-                this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/Panel";
-                this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/Panel";
+                this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/" + this.connection.drone + "/Panel";
+                this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/" + this.connection.drone + "/Panel";
                 this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/Panel";
 
                 //this.connection.host = "gcs.iotocean.org";
