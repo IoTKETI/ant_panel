@@ -45,18 +45,18 @@
 
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
-                        <br/>
-                        <h2 class="f1aa font-weight-black">Drone name:</h2>
+                        <!--                        <br/>-->
+                        <!--                        <h2 class="f1aa font-weight-black">Drone name:</h2>-->
 
-                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.drone }}</h2>
-                        <p></p>
-                        <h2 class="f1aa font-weight-black">System ID:</h2>
+                        <!--                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.drone }}</h2>-->
+                        <!--                        <p></p>-->
+                        <!--                        <h2 class="f1aa font-weight-black">System ID:</h2>-->
 
-                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.systemid }}</h2>
-                        <br/>
+                        <!--                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.systemid }}</h2>-->
+                        <!--                        <br/>-->
                         <v-btn
                             v-if="!tr_run_status"
-                            class="b0a"
+                            class="b0"
                             color="white"
                             x-large
                             block
@@ -69,7 +69,7 @@
                         </v-btn>
                         <v-btn
                             v-if="tr_run_status"
-                            class="b0a"
+                            class="b0"
                             color="white"
                             x-large
                             block
@@ -79,6 +79,30 @@
                             @click="doStop"
                         >
                             <strong class="bt1">Stop</strong>
+                        </v-btn>
+                        <v-btn
+                            class="b0 mt-5"
+                            color="white"
+                            x-large
+                            block
+                            outlined
+                            raised
+                            elevation="2"
+                            @click="doArrange"
+                        >
+                            <strong class="bt1">ARRANGE</strong>
+                        </v-btn>
+                        <v-btn
+                            class="b0 mt-5"
+                            color="white"
+                            x-large
+                            block
+                            outlined
+                            raised
+                            elevation="2"
+                            @click="doSetOffset"
+                        >
+                            <strong class="bt1">offset</strong>
                         </v-btn>
                     </v-card>
                 </v-col>
@@ -142,6 +166,7 @@
                         </v-row>
                     </v-card>
                 </v-col>
+
 
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
@@ -226,38 +251,38 @@
                         </v-row>
 
                         <!--
-                        <v-row class="mt-n6">
-                          <v-col>
-                            <v-btn
-                              v-if="!client.connected"
-                              class="bb"
-                              color="white"
-                              x-large
-                              block
-                              outlined
-                              raised
-                              elevation="2"
-                              @click="setbtn"
-                            >
-                              <strong class="bt1">connect</strong>
-                            </v-btn>
-                            <v-btn
-                              v-if="client.connected"
-                              class="bb"
-                              color="white"
-                              x-large
-                              block
-                              outlined
-                              raised
-                              elevation="2"
-                              @click="destroyConnection"
-                            >
-                              <strong class="bt1">disconnect</strong>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
+                                    <v-row class="mt-n6">
+                                      <v-col>
+                                        <v-btn
+                                          v-if="!client.connected"
+                                          class="bb"
+                                          color="white"
+                                          x-large
+                                          block
+                                          outlined
+                                          raised
+                                          elevation="2"
+                                          @click="setbtn"
+                                        >
+                                          <strong class="bt1">connect</strong>
+                                        </v-btn>
+                                        <v-btn
+                                          v-if="client.connected"
+                                          class="bb"
+                                          color="white"
+                                          x-large
+                                          block
+                                          outlined
+                                          raised
+                                          elevation="2"
+                                          @click="destroyConnection"
+                                        >
+                                          <strong class="bt1">disconnect</strong>
+                                        </v-btn>
+                                      </v-col>
+                                    </v-row>
 
-                        -->
+                                    -->
                     </v-card>
                 </v-col>
 
@@ -293,32 +318,65 @@
                 </v-col>
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
-                        <v-btn
-                            class="b0"
-                            color="white"
-                            x-large
-                            block
-                            outlined
-                            raised
-                            elevation="2"
-                            @click="doArrange"
-                        >
-                            <strong class="bt1">ARRANGE</strong>
-                        </v-btn>
                         <br/>
+                        <v-row>
+                            <v-row>
+                                <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px">
+                                    Tracker Alt :
+                                </p>
+                                <p class="f1aa-1 mt-n2 font-weight-black" style="font-size: 15px">
+                                    {{ curAlt }} m
+                                </p>
+                            </v-row>
+                            <v-row>
+                                <p class="f1aa font-weight-black" style="font-size: 15px">
+                                    ALTITUDE :
+                                </p>
+                            </v-row>
+                            <v-row>
+                                <v-text-field
+                                    class="text-white mt-n8 mb-n7"
+                                    label=""
+                                    color="white"
+                                    v-model="tr_altitude"
+                                    :rules="tr_altitude_rule"
+                                >
+                                </v-text-field>
+                            </v-row>
+                        </v-row>
 
-                        <v-btn
-                            class="b0"
-                            color="white"
-                            x-large
-                            block
-                            outlined
-                            raised
-                            elevation="2"
-                            @click="doTest"
-                        >
-                            <strong class="bt1">offset</strong>
-                        </v-btn>
+                        <br/>
+                        <p></p>
+                        <v-row>
+                            <v-col>
+                                <v-btn
+                                    class="z0"
+                                    color="white"
+                                    x-large
+                                    block
+                                    outlined
+                                    raised
+                                    elevation="2"
+                                    @click="fixGPS"
+                                >
+                                    <strong class="bt1">FIX</strong>
+                                </v-btn>
+                            </v-col>
+                            <v-col>
+                                <v-btn
+                                    class="z0"
+                                    color="white"
+                                    x-large
+                                    block
+                                    outlined
+                                    raised
+                                    elevation="2"
+                                    @click="moveGPS"
+                                >
+                                    <strong class="bt1">MOVE</strong>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
                     </v-card>
                 </v-col>
             </v-row>
@@ -370,6 +428,19 @@
                     <strong class="bt1">Drone Information</strong>
                 </v-btn>
             </v-col>
+            <!--            <v-snackbar-->
+            <!--                class=""-->
+            <!--                v-model="snackbar"-->
+            <!--                :timeout="-1"-->
+            <!--                :value="true"-->
+            <!--                absolute-->
+            <!--                centered-->
+            <!--                right-->
+            <!--                tile-->
+            <!--                color="red accent-2"-->
+            <!--            >-->
+            <!--                {{ text }}-->
+            <!--            </v-snackbar>-->
         </v-row>
 
         <div>
@@ -489,7 +560,7 @@
                                         outlined
                                         raised
                                         elevation="2"
-                                        @click="[savebtn(), show = !show]"
+                                        @click="[savebtn(), (show = !show)]"
                                     >
                                         <strong class="bt0">SAVE</strong>
                                     </v-btn>
@@ -500,7 +571,6 @@
                     </div>
                 </v-expand-transition>
             </v-card>
-
             <br/>
         </div>
     </v-container>
@@ -599,6 +669,8 @@ export default {
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/DroneName/Panel",
+            offsetTopic: "/Mobius/GcsName/Offset_Data/DroneName/Panel",
+            gpsControlTopic: "/Mobius/GcsName/Gps_Ctrl_Data/DroneName/Panel",
             altTopic: "/Mobius/GcsName/Alt_Data/DroneName/Panel",
 
             droneTopic: "/Mobius/GcsName/Drinfo_Data/Panel",
@@ -609,7 +681,17 @@ export default {
             response_text: "",
             rev_connted: false,
 
-            tr_run_status: null
+            tr_run_status: null,
+
+            curAlt: null,
+            tr_altitude: null,
+            tr_altitude_rule: [
+                v => !!v || 'Required.',
+                v => /^[.0-9]*$/.test(v) || 'Only numbers.'
+            ],
+            snackbar: false,
+            text: '',
+            timeout: 3000,
         };
     },
 
@@ -625,42 +707,48 @@ export default {
         },
         tiltUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.t_offset = this.init_t_angle - this.myTilt;
+            this.t_offset = this.myTilt - this.init_t_angle;
+            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         tiltDown: function () {
             this.doPublish(this.motorControlTopic, "tilt_down");
         },
         tiltDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.t_offset = this.init_t_angle - this.myTilt;
+            this.t_offset = this.myTilt - this.init_t_angle;
+            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         panDown: function () {
             this.doPublish(this.motorControlTopic, "pan_down");
         },
         panDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.p_offset = this.init_p_angle - this.myPan;
+            this.p_offset = this.myPan - this.init_p_angle;
+            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         panUp: function () {
             this.doPublish(this.motorControlTopic, "pan_up");
         },
         panUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.p_offset = this.init_p_angle - this.myPan;
+            this.p_offset = this.myPan - this.init_p_angle;
+            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         doRun: function () {
             this.tr_run_status = !this.tr_run_status;
             this.doPublish(this.motorControlTopic, "run");
         },
         doStop: function () {
+            this.tr_run_status = !this.tr_run_status;
             this.init_p_angle = this.myPan;
             this.init_t_angle = this.myTilt;
+            console.log('init_p_angle - ' + this.init_p_angle, 'init_t_angle - ' + this.init_t_angle);
         },
         doArrange: function () {
             this.doPublish(this.motorControlTopic, "arrange");
         },
-        doTest: function () {
-            this.doPublish(this.motorControlTopic, "test");
+        doSetOffset: function () {
+            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
         },
         setbtn: function () {
             // this.doPublish(this.altTopic, this.altset);
@@ -669,6 +757,24 @@ export default {
             localStorage.setItem("mobius-drone", this.connection.drone);
 
             this.createConnection();
+        },
+        fixGPS: function () {
+            if (this.tr_altitude) {
+                console.log('Fix GPS\n', 'Tracker Altitude -', this.tr_altitude + 'm');
+
+                this.doPublish(this.gpsControlTopic, "fix");
+            }
+            else {
+                console.log('Fix GPS\n', 'Tracker Altitude is null');
+
+                // TODO: null일 때 알림 띄우도록
+                this.text = 'Failed GPS fix. Tracker Altitude is null !'
+                this.snackbar = true;
+            }
+        },
+        moveGPS: function () {
+            console.log('Move GPS');
+            this.doPublish(this.gpsControlTopic, "move");
         },
 
         createConnection() {
@@ -733,6 +839,7 @@ export default {
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[topic_arr.length - 1] === "pan") {
+                            this.curAlt = JSON.parse(message.toString()).alt;
                             this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myPan = parseInt(this.myPan);
 
@@ -749,6 +856,7 @@ export default {
                             }
                         }
                         else if (topic_arr[topic_arr.length - 1] === "tilt") {
+                            this.curAlt = JSON.parse(message.toString()).alt;
                             this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myTilt = parseInt(this.myTilt);
 
@@ -890,6 +998,14 @@ export default {
     font-size: 13px;
 }
 
+.f1aa-1 {
+    text-align: end;
+    color: white;
+    font-weight: white;
+    letter-spacing: 5px;
+    font-size: 13px;
+}
+
 .f1ab {
     text-align: start;
     color: white;
@@ -967,8 +1083,16 @@ export default {
 .b0 {
     width: 100px;
     min-width: 100px;
-    height: 88px;
-    min-height: 88px;
+    height: 50px;
+    min-height: 50px;
+    letter-spacing: 2px;
+}
+
+.z0 {
+    width: 50px;
+    min-width: 50px;
+    height: 50px;
+    min-height: 50px;
     letter-spacing: 2px;
 }
 
