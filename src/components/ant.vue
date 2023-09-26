@@ -92,18 +92,43 @@
                         >
                             <strong class="bt1">ARRANGE</strong>
                         </v-btn>
-                        <v-btn
-                            class="b0 mt-5"
-                            color="white"
-                            x-large
-                            block
-                            outlined
-                            raised
-                            elevation="2"
-                            @click="doSetOffset"
-                        >
-                            <strong class="bt1">offset</strong>
-                        </v-btn>
+                        <v-row class="mt-n2">
+                            <v-col>
+                                <v-btn
+                                    class="z0 mt-5"
+                                    color="white"
+                                    x-large
+                                    block
+                                    outlined
+                                    raised
+                                    elevation="2"
+                                    @click="doSetOffset"
+                                >
+                                    <strong class="bt1">offset</strong>
+                                </v-btn>
+                            </v-col>
+                            <v-col>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            class="z0 mt-5"
+                                            color="white"
+                                            x-large
+                                            block
+                                            outlined
+                                            raised
+                                            elevation="2"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            @click="changeAntType"
+                                        >
+                                            <strong class="bt1">{{ antTypeMsg }}</strong>
+                                        </v-btn>
+                                    </template>
+                                    <span>{{ antTypeMsg }}으로 변경</span>
+                                </v-tooltip>
+                            </v-col>
+                        </v-row>
                     </v-card>
                 </v-col>
             </v-row>
@@ -643,6 +668,9 @@ export default {
             pTilt: 0,
             nTilt: 0,
 
+            antTypeFlag: localStorage.getItem("antTypeFlag") ? localStorage.getItem("antTypeFlag") : false,
+            antTypeMsg: localStorage.getItem("antTypeMsg") ? localStorage.getItem("antTypeMsg") : 'T+90°',
+
             // mqtt 연결부
             client: {
                 connected: false,
@@ -707,7 +735,12 @@ export default {
         },
         tiltUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.t_offset = this.myTilt - this.init_t_angle;
+            if (this.antTypeFlag) {
+                this.t_offset = this.myTilt - this.init_t_angle + 90;
+            }
+            else {
+                this.t_offset = this.myTilt - this.init_t_angle;
+            }
             console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         tiltDown: function () {
@@ -715,7 +748,12 @@ export default {
         },
         tiltDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.t_offset = this.myTilt - this.init_t_angle;
+            if (this.antTypeFlag) {
+                this.t_offset = this.myTilt - this.init_t_angle + 90;
+            }
+            else {
+                this.t_offset = this.myTilt - this.init_t_angle;
+            }
             console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         panDown: function () {
@@ -749,6 +787,21 @@ export default {
         },
         doSetOffset: function () {
             this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+        },
+        changeAntType: function () {
+            this.antTypeFlag = !this.antTypeFlag;
+            localStorage.setItem("antTypeFlag", this.antTypeFlag);
+
+            if (this.antTypeFlag) {
+                this.antTypeMsg = 'T+0°';
+                this.t_offset = this.t_offset + 90;
+                this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+            }
+            else {
+                this.antTypeMsg = 'T+90°';
+                this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+            }
+            localStorage.setItem("antTypeMsg", this.antTypeMsg);
         },
         setbtn: function () {
             // this.doPublish(this.altTopic, this.altset);
@@ -835,7 +888,7 @@ export default {
                     });
 
                     this.client.on("message", (topic, message) => {
-                        console.log("Received " + message.toString() + " From " + topic);
+                        // console.log("Received " + message.toString() + " From " + topic);
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[topic_arr.length - 1] === "pan") {
