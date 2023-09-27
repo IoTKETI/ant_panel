@@ -585,7 +585,7 @@
                                         outlined
                                         raised
                                         elevation="2"
-                                        @click="[savebtn(), (show = !show)]"
+                                        @click="savebtn"
                                     >
                                         <strong class="bt0">SAVE</strong>
                                     </v-btn>
@@ -636,7 +636,6 @@ export default {
             type_rule: [(v) => !!v || "type 값은 필수 입력사항입니다."],
             systemid_rule: [(v) => !!v || "system ID 값은 필수 입력사항입니다."],
             gcsip_rule: [(v) => !!v || "GCS IP 값은 필수 입력사항입니다."],
-            //kcmvp_rule: [(v) => !!v || "KCMVP 값은 필수 입력사항입니다."],
 
             altset: "",
             altset_rule: [
@@ -722,9 +721,9 @@ export default {
             timeout: 3000,
         };
     },
-
     methods: {
         savebtn: function () {
+            this.show = !this.show;
             console.log(JSON.stringify(this.drone_info));
             localStorage.setItem("drone_info", JSON.stringify(this.drone_info))
             this.doPublish(this.droneTopic, JSON.stringify(this.drone_info));
@@ -844,7 +843,7 @@ export default {
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/" + this.connection.drone + "/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/" + this.connection.drone + "/Panel";
-                this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/Panel";
+                this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/" + this.connection.drone + "/Panel";
 
                 console.log("Host is : " + this.connection.host);
                 const {host, port, endpoint, ...options} = this.connection;
@@ -950,18 +949,6 @@ export default {
             }
         },
 
-        doUnSubscribe(topic) {
-            if (this.client.connected) {
-                this.client.unsubscribe(topic, (error) => {
-                    if (error) {
-                        console.log("Unsubscribe error", error);
-                    }
-
-                    console.log("Unsubscribe to topics (", topic, ")");
-                });
-            }
-        },
-
         doPublish(topic, payload) {
             if (this.client.connected) {
                 this.client.publish(topic, payload, 0, (error) => {
@@ -1011,7 +998,6 @@ export default {
 <style lang="scss">
 #app {
     text-align: center;
-    font-weight: white;
     color: white;
     background: rgb(53, 53, 53);
     display: flex;
@@ -1030,7 +1016,6 @@ export default {
 .f0 {
     text-align: left;
     color: black;
-    font-weight: black;
     letter-spacing: 3px;
     font-size: 20px;
 }
@@ -1038,7 +1023,6 @@ export default {
 .f1 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 20px;
 }
@@ -1046,7 +1030,6 @@ export default {
 .f1aa {
     text-align: start;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 13px;
 }
@@ -1054,7 +1037,6 @@ export default {
 .f1aa-1 {
     text-align: end;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 13px;
 }
@@ -1062,7 +1044,6 @@ export default {
 .f1ab {
     text-align: start;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 10px;
 }
@@ -1070,7 +1051,6 @@ export default {
 .f1b {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 5px;
     font-size: 18px;
 }
@@ -1078,7 +1058,6 @@ export default {
 .f2 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 8px;
     font-size: 20px;
 }
@@ -1086,7 +1065,6 @@ export default {
 .f3 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 3px;
     font-size: 25px;
 }
@@ -1094,7 +1072,6 @@ export default {
 .f4 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 3px;
     font-size: 32px;
 }
@@ -1102,7 +1079,6 @@ export default {
 .bt0 {
     text-align: center;
     color: black;
-    font-weight: black;
     letter-spacing: 2px;
     font-size: 15px;
 }
@@ -1110,7 +1086,6 @@ export default {
 .bt1 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
 }
@@ -1118,7 +1093,6 @@ export default {
 .bt2 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
     transform: rotate(90deg);
@@ -1127,7 +1101,6 @@ export default {
 .bt3 {
     text-align: center;
     color: white;
-    font-weight: white;
     letter-spacing: 2px;
     font-size: 15px;
     transform: rotate(270deg);
@@ -1161,7 +1134,6 @@ export default {
     width: 100px;
     min-width: 100px;
     height: 88px;
-    min-height: 0px;
     letter-spacing: 2px;
 }
 
@@ -1174,7 +1146,6 @@ export default {
 
 .sb {
     color: black;
-    font-weight: black;
     width: 50px;
     min-width: 50px;
     height: 50px;
