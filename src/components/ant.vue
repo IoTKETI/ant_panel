@@ -76,7 +76,7 @@
                             outlined
                             raised
                             elevation="2"
-                            @click="doStop"
+                            @click="doRun"
                         >
                             <strong class="bt1">Stop</strong>
                         </v-btn>
@@ -507,8 +507,8 @@
                                     <v-text-field
                                         class="text-black"
                                         label="APPROVAL GCS :"
-                                        v-model="drone_info.drone"
-                                        :rules="drone_rule"
+                                        v-model="drone_info.approval_gcs"
+                                        :rules="gcs_rule"
                                         model-value=""
                                         prefix=" "
                                         color="black"
@@ -793,7 +793,7 @@ export default {
 
             if (this.antTypeFlag) {
                 this.antTypeMsg = 'T+0°';
-                this.t_offset = this.t_offset + 90;
+                this.t_offset = this.t_offset - 90;
                 this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
             }
             else {
@@ -887,7 +887,7 @@ export default {
                     });
 
                     this.client.on("message", (topic, message) => {
-                        // console.log("Received " + message.toString() + " From " + topic);
+                        console.log("Received " + message.toString() + " From " + topic);
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[topic_arr.length - 1] === "pan") {
