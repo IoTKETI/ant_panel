@@ -27,6 +27,7 @@
                                 touchstart: tiltUp,
                                 touchend: tiltUpStop,
                             }"
+                            :disabled="!client.connected"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -64,6 +65,7 @@
                             raised
                             elevation="2"
                             @click="doRun"
+                            :disabled="!client.connected"
                         >
                             <strong class="bt1">RUN</strong>
                         </v-btn>
@@ -77,6 +79,7 @@
                             raised
                             elevation="2"
                             @click="doRun"
+                            :disabled="!client.connected"
                         >
                             <strong class="bt1">Stop</strong>
                         </v-btn>
@@ -89,6 +92,7 @@
                             raised
                             elevation="2"
                             @click="doArrange"
+                            :disabled="!client.connected"
                         >
                             <strong class="bt1">ARRANGE</strong>
                         </v-btn>
@@ -103,6 +107,7 @@
                                     raised
                                     elevation="2"
                                     @click="doSetOffset"
+                                    :disabled="!client.connected"
                                 >
                                     <strong class="bt1">offset</strong>
                                 </v-btn>
@@ -121,6 +126,7 @@
                                             v-bind="attrs"
                                             v-on="on"
                                             @click="changeAntType"
+                                            :disabled="!client.connected"
                                         >
                                             <strong class="bt1">{{ antTypeMsg }}</strong>
                                         </v-btn>
@@ -150,6 +156,7 @@
                                 touchstart: panDown,
                                 touchend: panDownStop,
                             }"
+                            :disabled="!client.connected"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -209,6 +216,7 @@
                                 touchstart: panUp,
                                 touchend: panUpStop,
                             }"
+                            :disabled="!client.connected"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -327,6 +335,7 @@
                                 touchstart: tiltDown,
                                 touchend: tiltDownStop,
                             }"
+                            :disabled="!client.connected"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -382,9 +391,10 @@
                                     outlined
                                     raised
                                     elevation="2"
-                                    @click="fixGPS"
+                                    @click="holdGPS"
+                                    :disabled="gps_flag || !client.connected"
                                 >
-                                    <strong class="bt1">FIX</strong>
+                                    <strong class="bt1">HOLD</strong>
                                 </v-btn>
                             </v-col>
                             <v-col>
@@ -396,9 +406,10 @@
                                     outlined
                                     raised
                                     elevation="2"
-                                    @click="moveGPS"
+                                    @click="releaseGPS"
+                                    :disabled="!gps_flag || !client.connected"
                                 >
-                                    <strong class="bt1">MOVE</strong>
+                                    <strong class="bt1">Release</strong>
                                 </v-btn>
                             </v-col>
                         </v-row>
@@ -453,19 +464,14 @@
                     <strong class="bt1">Drone Information</strong>
                 </v-btn>
             </v-col>
-            <!--            <v-snackbar-->
-            <!--                class=""-->
-            <!--                v-model="snackbar"-->
-            <!--                :timeout="-1"-->
-            <!--                :value="true"-->
-            <!--                absolute-->
-            <!--                centered-->
-            <!--                right-->
-            <!--                tile-->
-            <!--                color="red accent-2"-->
-            <!--            >-->
-            <!--                {{ text }}-->
-            <!--            </v-snackbar>-->
+            <v-snackbar
+                v-model="snackbar"
+                :timeout="timeout"
+                :value="true"
+                color="rgb(53, 53, 53)"
+            >
+                {{ text }}
+            </v-snackbar>
         </v-row>
 
         <div>
@@ -708,17 +714,20 @@ export default {
             response_text: "",
             rev_connted: false,
 
-            tr_run_status: null,
+            tr_run_status: false,
 
             curAlt: null,
             tr_altitude: null,
             tr_altitude_rule: [
-                v => !!v || 'Required.',
                 v => /^[.0-9]*$/.test(v) || 'Only numbers.'
             ],
+
             snackbar: false,
             text: '',
             timeout: 3000,
+
+            gps_flag: false,
+            alreadyRun: false
         };
     },
     methods: {
@@ -734,58 +743,70 @@ export default {
         },
         tiltUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.antTypeFlag) {
-                this.t_offset = this.myTilt - this.init_t_angle + 90;
+            if (this.alreadyRun) {
+                if (this.antTypeFlag) {
+                    this.t_offset = this.myTilt - this.init_t_angle + 90;
+                }
+                else {
+                    this.t_offset = this.myTilt - this.init_t_angle;
+                }
+                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
             }
-            else {
-                this.t_offset = this.myTilt - this.init_t_angle;
-            }
-            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         tiltDown: function () {
             this.doPublish(this.motorControlTopic, "tilt_down");
         },
         tiltDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.antTypeFlag) {
-                this.t_offset = this.myTilt - this.init_t_angle + 90;
+            if (this.alreadyRun) {
+                if (this.antTypeFlag) {
+                    this.t_offset = this.myTilt - this.init_t_angle + 90;
+                }
+                else {
+                    this.t_offset = this.myTilt - this.init_t_angle;
+                }
+                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
             }
-            else {
-                this.t_offset = this.myTilt - this.init_t_angle;
-            }
-            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
         },
         panDown: function () {
             this.doPublish(this.motorControlTopic, "pan_down");
         },
         panDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.p_offset = this.myPan - this.init_p_angle;
-            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
+            if (this.alreadyRun) {
+                this.p_offset = this.myPan - this.init_p_angle;
+                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
+            }
         },
         panUp: function () {
             this.doPublish(this.motorControlTopic, "pan_up");
         },
         panUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            this.p_offset = this.myPan - this.init_p_angle;
-            console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
+            if (this.alreadyRun) {
+                this.p_offset = this.myPan - this.init_p_angle;
+                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
+            }
         },
         doRun: function () {
             this.tr_run_status = !this.tr_run_status;
             this.doPublish(this.motorControlTopic, "run");
-        },
-        doStop: function () {
-            this.tr_run_status = !this.tr_run_status;
-            this.init_p_angle = this.myPan;
-            this.init_t_angle = this.myTilt;
-            console.log('init_p_angle - ' + this.init_p_angle, 'init_t_angle - ' + this.init_t_angle);
+            if (!this.tr_run_status) {
+                if (this.alreadyRun) {
+                    this.init_p_angle = this.myPan;
+                    this.init_t_angle = this.myTilt;
+                    console.log('init_p_angle - ' + this.init_p_angle, 'init_t_angle - ' + this.init_t_angle);
+                }
+            }
+            else {
+                this.alreadyRun = true;
+            }
         },
         doArrange: function () {
             this.doPublish(this.motorControlTopic, "arrange");
         },
         doSetOffset: function () {
-            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)}));
         },
         changeAntType: function () {
             this.antTypeFlag = !this.antTypeFlag;
@@ -810,23 +831,29 @@ export default {
 
             this.createConnection();
         },
-        fixGPS: function () {
+        holdGPS: function () {
             if (this.tr_altitude) {
-                console.log('Fix GPS\n', 'Tracker Altitude -', this.tr_altitude + 'm');
+                console.log('Hold GPS\n', 'Tracker Altitude -', this.tr_altitude + 'm');
 
-                this.doPublish(this.gpsControlTopic, "fix");
+                this.doPublish(this.gpsControlTopic, "hold," + this.tr_altitude);
+                this.text = '고도를 ' + this.tr_altitude + 'm로 고정합니다.';
             }
             else {
-                console.log('Fix GPS\n', 'Tracker Altitude is null');
+                console.log('Hold GPS\n', 'Tracker Altitude is null');
 
-                // TODO: null일 때 알림 띄우도록
-                this.text = 'Failed GPS fix. Tracker Altitude is null !'
-                this.snackbar = true;
+                this.doPublish(this.gpsControlTopic, "hold," + this.curAlt);
+                this.text = '현재 고도(' + this.curAlt + 'm)로 고정합니다.';
             }
+            this.snackbar = true;
+            this.gps_flag = true;
         },
-        moveGPS: function () {
-            console.log('Move GPS');
-            this.doPublish(this.gpsControlTopic, "move");
+        releaseGPS: function () {
+            console.log('Release GPS');
+            this.doPublish(this.gpsControlTopic, "release");
+            this.gps_flag = false;
+            this.text = 'GPS 고정을 해제합니다.';
+
+            this.snackbar = true;
         },
 
         createConnection() {
@@ -840,6 +867,8 @@ export default {
 
                 this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pan";
                 this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/tilt";
+
+                this.offsetTopic = "/Mobius/" + this.connection.gcs + "/Offset_Data/" + this.connection.drone + "/Panel";
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/" + this.connection.drone + "/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/" + this.connection.drone + "/Panel";
@@ -887,11 +916,13 @@ export default {
                     });
 
                     this.client.on("message", (topic, message) => {
-                        console.log("Received " + message.toString() + " From " + topic);
+                        // console.log("Received " + message.toString() + " From " + topic);
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[topic_arr.length - 1] === "pan") {
-                            this.curAlt = JSON.parse(message.toString()).alt;
+                            if (!this.gps_flag) {
+                                this.curAlt = JSON.parse(message.toString()).alt;
+                            }
                             this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myPan = parseInt(this.myPan);
 
@@ -908,7 +939,9 @@ export default {
                             }
                         }
                         else if (topic_arr[topic_arr.length - 1] === "tilt") {
-                            this.curAlt = JSON.parse(message.toString()).alt;
+                            if (!this.gps_flag) {
+                                this.curAlt = JSON.parse(message.toString()).alt;
+                            }
                             this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
                             this.myTilt = parseInt(this.myTilt);
 
@@ -956,6 +989,7 @@ export default {
                         console.log("Publish error", error);
                     }
                 });
+                console.log('publish', topic, payload)
             }
         },
 
@@ -969,6 +1003,12 @@ export default {
                         connected: false,
                         loading: false,
                     };
+                    this.show = false
+                    this.rev_connted = false
+                    this.tr_run_status = false
+                    this.curAlt = null
+                    this.gps_flag = false
+                    this.alreadyRun = false
                     console.log(this.connection.host + " - " + this.connection.gcs, "\nSuccessfully disconnected!");
                 }
                 catch (error) {
