@@ -673,8 +673,10 @@ export default {
             pTilt: 0,
             nTilt: 0,
 
-            antTypeFlag: localStorage.getItem("antTypeFlag") ? localStorage.getItem("antTypeFlag") : false,
-            antTypeMsg: localStorage.getItem("antTypeMsg") ? localStorage.getItem("antTypeMsg") : 'T+90°',
+            // antTypeFlag: localStorage.getItem("antTypeFlag") ? localStorage.getItem("antTypeFlag") : false,
+            // antTypeMsg: localStorage.getItem("antTypeMsg") ? localStorage.getItem("antTypeMsg") : 'T+90°',
+            antTypeFlag: false,
+            antTypeMsg: 'T90°',
 
             // mqtt 연결부
             client: {
@@ -803,6 +805,9 @@ export default {
             }
         },
         doArrange: function () {
+            this.p_offset = 0;
+            this.t_offset = 0;
+            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)}));
             this.doPublish(this.motorControlTopic, "arrange");
         },
         doSetOffset: function () {
@@ -810,18 +815,17 @@ export default {
         },
         changeAntType: function () {
             this.antTypeFlag = !this.antTypeFlag;
-            localStorage.setItem("antTypeFlag", this.antTypeFlag);
+            // localStorage.setItem("antTypeFlag", this.antTypeFlag);
 
             if (this.antTypeFlag) {
-                this.antTypeMsg = 'T+0°';
-                this.t_offset = this.t_offset - 90;
-                this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+                this.antTypeMsg = 'T0°';
+                this.doPublish(this.offsetTopic, JSON.stringify({type: 'T90'}));
             }
             else {
-                this.antTypeMsg = 'T+90°';
-                this.doPublish(this.offsetTopic, JSON.stringify({p_offset: this.p_offset, t_offset: this.t_offset}));
+                this.antTypeMsg = 'T90°';
+                this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
             }
-            localStorage.setItem("antTypeMsg", this.antTypeMsg);
+            // localStorage.setItem("antTypeMsg", this.antTypeMsg);
         },
         setbtn: function () {
             // this.doPublish(this.altTopic, this.altset);
@@ -1009,6 +1013,8 @@ export default {
                     this.curAlt = null
                     this.gps_flag = false
                     this.alreadyRun = false
+                    this.myPan = 0;
+                    this.myTilt = 0;
                     console.log(this.connection.host + " - " + this.connection.gcs, "\nSuccessfully disconnected!");
                 }
                 catch (error) {
