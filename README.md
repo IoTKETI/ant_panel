@@ -1,4 +1,4 @@
-# KETI Approval Web
+# KETI Tracker Panel Web
 
 ## Project setup
 ```

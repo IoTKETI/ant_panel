@@ -112,28 +112,28 @@
                                     <strong class="bt1">offset</strong>
                                 </v-btn>
                             </v-col>
-                            <v-col>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                            class="z0 mt-5"
-                                            color="white"
-                                            x-large
-                                            block
-                                            outlined
-                                            raised
-                                            elevation="2"
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            @click="changeAntType"
-                                            :disabled="!client.connected"
-                                        >
-                                            <strong class="bt1">{{ antTypeMsg }}</strong>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ antTypeMsg }}으로 변경</span>
-                                </v-tooltip>
-                            </v-col>
+<!--                            <v-col>-->
+<!--                                <v-tooltip bottom>-->
+<!--                                    <template v-slot:activator="{ on, attrs }">-->
+<!--                                        <v-btn-->
+<!--                                            class="z0 mt-5"-->
+<!--                                            color="white"-->
+<!--                                            x-large-->
+<!--                                            block-->
+<!--                                            outlined-->
+<!--                                            raised-->
+<!--                                            elevation="2"-->
+<!--                                            v-bind="attrs"-->
+<!--                                            v-on="on"-->
+<!--                                            @click="changeAntType"-->
+<!--                                            :disabled="!client.connected"-->
+<!--                                        >-->
+<!--                                            <strong class="bt1">{{ antTypeMsg }}</strong>-->
+<!--                                        </v-btn>-->
+<!--                                    </template>-->
+<!--                                    <span>{{ antTypeMsg }}으로 변경</span>-->
+<!--                                </v-tooltip>-->
+<!--                            </v-col>-->
                         </v-row>
                     </v-card>
                 </v-col>
@@ -699,8 +699,7 @@ export default {
             },
 
             getDataTopic: {
-                pan: "/Mobius/GcsName/Tr_Data/DroneName/pan",
-                tilt: "/Mobius/GcsName/Tr_Data/DroneName/tilt",
+                pantilt: "/Mobius/GcsName/Tr_Data/DroneName/pantilt"
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/DroneName/Panel",
@@ -813,20 +812,20 @@ export default {
         doSetOffset: function () {
             this.doPublish(this.offsetTopic, JSON.stringify({p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)}));
         },
-        changeAntType: function () {
-            this.antTypeFlag = !this.antTypeFlag;
-            // localStorage.setItem("antTypeFlag", this.antTypeFlag);
-
-            if (this.antTypeFlag) {
-                this.antTypeMsg = 'T0°';
-                this.doPublish(this.offsetTopic, JSON.stringify({type: 'T90'}));
-            }
-            else {
-                this.antTypeMsg = 'T90°';
-                this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
-            }
-            // localStorage.setItem("antTypeMsg", this.antTypeMsg);
-        },
+        // changeAntType: function () {
+        //     this.antTypeFlag = !this.antTypeFlag;
+        //     // localStorage.setItem("antTypeFlag", this.antTypeFlag);
+        //
+        //     if (this.antTypeFlag) {
+        //         this.antTypeMsg = 'T0°';
+        //         this.doPublish(this.offsetTopic, JSON.stringify({type: 'T90'}));
+        //     }
+        //     else {
+        //         this.antTypeMsg = 'T90°';
+        //         this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
+        //     }
+        //     // localStorage.setItem("antTypeMsg", this.antTypeMsg);
+        // },
         setbtn: function () {
             // this.doPublish(this.altTopic, this.altset);
             localStorage.setItem("mobius-host", this.connection.host);
@@ -869,8 +868,7 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                this.getDataTopic.pan = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pan";
-                this.getDataTopic.tilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/tilt";
+                this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pantilt";
 
                 this.offsetTopic = "/Mobius/" + this.connection.gcs + "/Offset_Data/" + this.connection.drone + "/Panel";
 
@@ -890,8 +888,7 @@ export default {
                         this.client.connected = true;
                         this.client.loading = false;
 
-                        this.doSubscribe(this.getDataTopic.pan);
-                        this.doSubscribe(this.getDataTopic.tilt);
+                        this.doSubscribe(this.getDataTopic.pantilt);
 
                         //console.log("myTilt: " + this.myTilt);
 
@@ -923,11 +920,11 @@ export default {
                         // console.log("Received " + message.toString() + " From " + topic);
 
                         let topic_arr = topic.split("/");
-                        if (topic_arr[topic_arr.length - 1] === "pan") {
+                        if (topic_arr[topic_arr.length - 1] === "pantilt") {
                             if (!this.gps_flag) {
                                 this.curAlt = JSON.parse(message.toString()).alt;
                             }
-                            this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
+                            this.myPan = parseInt(JSON.parse(message.toString()).pan_angle).toFixed(1);
                             this.myPan = parseInt(this.myPan);
 
                             if (this.myPan > 0) {
@@ -941,12 +938,8 @@ export default {
                                 this.nPan = parseInt(this.nPan);
                                 this.pPan = 0;
                             }
-                        }
-                        else if (topic_arr[topic_arr.length - 1] === "tilt") {
-                            if (!this.gps_flag) {
-                                this.curAlt = JSON.parse(message.toString()).alt;
-                            }
-                            this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
+
+                            this.myTilt = parseInt(JSON.parse(message.toString()).tilt_angle).toFixed(1);
                             this.myTilt = parseInt(this.myTilt);
 
                             if (this.myTilt > 0) {
