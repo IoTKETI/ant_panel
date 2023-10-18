@@ -27,7 +27,7 @@
                                 touchstart: tiltUp,
                                 touchend: tiltUpStop,
                             }"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state !== 'ready'"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -47,7 +47,7 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <v-btn
-                            v-if="!tr_run_status"
+                            v-if="tr_state !== 'run'"
                             class="b0"
                             color="white"
                             x-large
@@ -56,12 +56,12 @@
                             raised
                             elevation="2"
                             @click="doRun"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state === 'arranging'"
                         >
                             <strong class="bt1">RUN</strong>
                         </v-btn>
                         <v-btn
-                            v-if="tr_run_status"
+                            v-if="tr_state === 'run'"
                             class="b0"
                             color="white"
                             x-large
@@ -70,7 +70,7 @@
                             raised
                             elevation="2"
                             @click="doRun"
-                            :disabled="!client.connected || stop_flag"
+                            :disabled="!client.connected"
                         >
                             <strong class="bt1">Stop</strong>
                         </v-btn>
@@ -84,7 +84,7 @@
                             raised
                             elevation="2"
                             @click="doArrange"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state === 'run'"
                         >
                             <strong class="bt1">ARRANGE</strong>
                         </v-btn>
@@ -98,48 +98,48 @@
                             raised
                             elevation="2"
                             @click="doArrange"
-                            :disabled="!client.connected || stop_flag"
+                            :disabled="!client.connected"
                         >
                             <strong class="bt1">STOP</strong>
                         </v-btn>
                         <v-row class="mt-n2">
-<!--                            <v-col>-->
-<!--                                <v-btn-->
-<!--                                    class="z0 mt-5"-->
-<!--                                    color="white"-->
-<!--                                    x-large-->
-<!--                                    block-->
-<!--                                    outlined-->
-<!--                                    raised-->
-<!--                                    elevation="2"-->
-<!--                                    @click="doSetOffset"-->
-<!--                                    :disabled="!client.connected"-->
-<!--                                >-->
-<!--                                    <strong class="bt1">offset</strong>-->
-<!--                                </v-btn>-->
-<!--                            </v-col>-->
-                            <v-col>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                            class="z0 mt-5"
-                                            color="white"
-                                            x-large
-                                            block
-                                            outlined
-                                            raised
-                                            elevation="2"
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            @click="changeAntType"
-                                            :disabled="!client.connected"
-                                        >
-                                            <strong class="bt1">{{ antTypeMsg }}</strong>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ antTypeMsg }}으로 변경</span>
-                                </v-tooltip>
-                            </v-col>
+                            <!--                            <v-col>-->
+                            <!--                                <v-btn-->
+                            <!--                                    class="z0 mt-5"-->
+                            <!--                                    color="white"-->
+                            <!--                                    x-large-->
+                            <!--                                    block-->
+                            <!--                                    outlined-->
+                            <!--                                    raised-->
+                            <!--                                    elevation="2"-->
+                            <!--                                    @click="doSetOffset"-->
+                            <!--                                    :disabled="!client.connected"-->
+                            <!--                                >-->
+                            <!--                                    <strong class="bt1">offset</strong>-->
+                            <!--                                </v-btn>-->
+                            <!--                            </v-col>-->
+                            <!--                            <v-col>-->
+                            <!--                                <v-tooltip bottom>-->
+                            <!--                                    <template v-slot:activator="{ on, attrs }">-->
+                            <!--                                        <v-btn-->
+                            <!--                                            class="z0 mt-5"-->
+                            <!--                                            color="white"-->
+                            <!--                                            x-large-->
+                            <!--                                            block-->
+                            <!--                                            outlined-->
+                            <!--                                            raised-->
+                            <!--                                            elevation="2"-->
+                            <!--                                            v-bind="attrs"-->
+                            <!--                                            v-on="on"-->
+                            <!--                                            @click="changeAntType"-->
+                            <!--                                            :disabled="!client.connected"-->
+                            <!--                                        >-->
+                            <!--                                            <strong class="bt1">{{ antTypeMsg }}</strong>-->
+                            <!--                                        </v-btn>-->
+                            <!--                                    </template>-->
+                            <!--                                    <span>{{ antTypeMsg }}으로 변경</span>-->
+                            <!--                                </v-tooltip>-->
+                            <!--                            </v-col>-->
                         </v-row>
                     </v-card>
                 </v-col>
@@ -162,7 +162,7 @@
                                 touchstart: panDown,
                                 touchend: panDownStop,
                             }"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state !== 'ready'"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -180,27 +180,38 @@
                 </v-col>
 
                 <v-col>
-                    <v-card class="v1" outlined color="transparent">
-                        <p>&nbsp;</p>
+                    <v-card class="v1" outlined color="transparent" style="height: 100px">
                         <v-row>
-                            <v-col></v-col>
                             <v-col>
                                 <p class="f2 font-weight-black">PAN</p>
                             </v-col>
                             <v-col>
                                 <p class="f2 font-weight-black">{{ myPan }}</p>
                             </v-col>
-                            <v-col></v-col>
                         </v-row>
-                        <v-row>
-                            <v-col></v-col>
+                        <v-row class="mt-n6">
                             <v-col>
                                 <p class="f2 font-weight-black">TILT</p>
                             </v-col>
                             <v-col>
                                 <p class="f2 font-weight-black">{{ myTilt }}</p>
                             </v-col>
-                            <v-col></v-col>
+                        </v-row>
+                        <v-row class="mt-n6">
+                            <v-col>
+                                <p class="f2 font-weight-black">TYPE</p>
+                            </v-col>
+                            <v-col>
+                                <p class="f2 font-weight-black">{{ ant_type }}</p>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-n6">
+                            <v-col>
+                                <p class="f2 font-weight-black">GPS</p>
+                            </v-col>
+                            <v-col>
+                                <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update }}</p>
+                            </v-col>
                         </v-row>
                     </v-card>
                 </v-col>
@@ -222,7 +233,7 @@
                                 touchstart: panUp,
                                 touchend: panUpStop,
                             }"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state !== 'ready'"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -307,7 +318,7 @@
                                 touchstart: tiltDown,
                                 touchend: tiltDownStop,
                             }"
-                            :disabled="!client.connected || !stop_flag"
+                            :disabled="!client.connected || tr_state !== 'ready'"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -325,7 +336,7 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <br/>
-                        <v-row>
+                        <v-row class="mt-8">
                             <v-row>
                                 <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px">
                                     Tracker Alt :
@@ -334,57 +345,76 @@
                                     {{ curAlt }} m
                                 </p>
                             </v-row>
-                            <v-row>
-                                <p class="f1aa font-weight-black" style="font-size: 15px">
-                                    ALTITUDE :
-                                </p>
-                            </v-row>
-                            <v-row>
-                                <v-text-field
-                                    class="text-white mt-n8 mb-n7"
-                                    label=""
-                                    color="white"
-                                    v-model="tr_altitude"
-                                    :rules="tr_altitude_rule"
-                                >
-                                </v-text-field>
-                            </v-row>
+                            <!--                            <v-row>-->
+                            <!--                                <p class="f1aa font-weight-black" style="font-size: 15px">-->
+                            <!--                                    ALTITUDE :-->
+                            <!--                                </p>-->
+                            <!--                            </v-row>-->
+                            <!--                            <v-row>-->
+                            <!--                                <v-text-field-->
+                            <!--                                    class="text-white mt-n8 mb-n7"-->
+                            <!--                                    label=""-->
+                            <!--                                    color="white"-->
+                            <!--                                    v-model="tr_altitude"-->
+                            <!--                                    :rules="tr_altitude_rule"-->
+                            <!--                                >-->
+                            <!--                                </v-text-field>-->
+                            <!--                            </v-row>-->
                         </v-row>
 
                         <br/>
                         <p></p>
-                        <v-row>
-                            <v-col>
-                                <v-btn
-                                    class="z0"
+                        <v-row
+                            class="justify-end pr-3"
+                        >
+                            <v-btn
+                                color="white"
+                                x-large
+                                outlined
+                                raised
+                                width="20"
+                                height="50"
+                                elevation="2"
+                                @click="dialog=true"
+                            >
+                                <v-icon
                                     color="white"
-                                    x-large
-                                    block
-                                    outlined
-                                    raised
-                                    elevation="2"
-                                    @click="holdGPS"
-                                    :disabled="gps_update || !client.connected"
-                                >
-                                    <strong class="bt1">HOLD</strong>
-                                </v-btn>
-                            </v-col>
-                            <v-col>
-                                <v-btn
-                                    class="z0"
-                                    color="white"
-                                    x-large
-                                    block
-                                    outlined
-                                    raised
-                                    elevation="2"
-                                    @click="releaseGPS"
-                                    :disabled="!gps_update || !client.connected"
-                                >
-                                    <strong class="bt1">Release</strong>
-                                </v-btn>
-                            </v-col>
+                                    size="30"
+                                >$cogTransfer
+                                </v-icon>
+                            </v-btn>
                         </v-row>
+
+                        <!--                            <v-col>-->
+                        <!--                                <v-btn-->
+                        <!--                                    class="z0"-->
+                        <!--                                    color="white"-->
+                        <!--                                    x-large-->
+                        <!--                                    block-->
+                        <!--                                    outlined-->
+                        <!--                                    raised-->
+                        <!--                                    elevation="2"-->
+                        <!--                                    @click="holdGPS"-->
+                        <!--                                    :disabled="gps_update || !client.connected"-->
+                        <!--                                >-->
+                        <!--                                    <strong class="bt1">HOLD</strong>-->
+                        <!--                                </v-btn>-->
+                        <!--                            </v-col>-->
+                        <!--                            <v-col>-->
+                        <!--                                <v-btn-->
+                        <!--                                    class="z0"-->
+                        <!--                                    color="white"-->
+                        <!--                                    x-large-->
+                        <!--                                    block-->
+                        <!--                                    outlined-->
+                        <!--                                    raised-->
+                        <!--                                    elevation="2"-->
+                        <!--                                    @click="releaseGPS"-->
+                        <!--                                    :disabled="!gps_update || !client.connected"-->
+                        <!--                                >-->
+                        <!--                                    <strong class="bt1">Release</strong>-->
+                        <!--                                </v-btn>-->
+                        <!--                            </v-col>-->
                     </v-card>
                 </v-col>
             </v-row>
@@ -436,15 +466,122 @@
                     <strong class="bt1">Drone Information</strong>
                 </v-btn>
             </v-col>
-            <v-snackbar
-                v-model="snackbar"
-                :timeout="timeout"
-                :value="true"
-                color="rgb(53, 53, 53)"
-            >
-                {{ text }}
-            </v-snackbar>
         </v-row>
+
+        <v-dialog
+            v-model="dialog"
+            max-width="450"
+            dark
+        >
+            <v-card class="pa-6 pl-1 pb-2">
+                <v-card-title class="ml-n1 mt-n6 mr-n6" style="background-color: #353535; height: 50px;">
+                    <span class="headline white--text mt-n2">Settings</span>
+                </v-card-title>
+                <v-row no-gutters align="center" justify="center" class="mt-7">
+                    <v-col cols="6">
+                        <v-row no-gutters align="center" justify="center" style="height: 60px">
+                            <p class="f1aa font-weight-black text-end" style="font-size: 15px">
+                                ANTENA TYPE :
+                            </p>
+                        </v-row>
+                        <v-row no-gutters align="center" justify="center" style="height: 60px">
+                            <p class="f1aa font-weight-black text-end" style="font-size: 15px">
+                                ALTITUDE :
+                            </p>
+                        </v-row>
+                        <v-spacer/>
+                        <v-row no-gutters align="center" justify="center" style="height: 60px">
+                            <p class="f1aa font-weight-black text-end" style="font-size: 15px">
+                                GPS HOLD :
+                            </p>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-row no-gutters align="center" justify="center" class="mt-n5">
+                            <v-btn
+                                class="z1"
+                                color="white"
+                                x-large
+                                outlined
+                                raised
+                                elevation="2"
+                                @click="changeAntType"
+                                :disabled="!client.connected"
+                            >
+                                <strong class="bt1">{{ antTypeMsg }}</strong>
+                            </v-btn>
+                        </v-row>
+                        <v-row no-gutters align="center" justify="center">
+                            <v-col cols="6">
+                                <v-text-field
+                                    class="text-white"
+                                    label=""
+                                    color="white"
+                                    v-model="tr_altitude"
+                                    :rules="tr_altitude_rule"
+                                >
+                                </v-text-field>
+                            </v-col>
+                            <v-col cols="3">
+                                <p class="font-weight-black mt-4" style="font-size: 13px">
+                                    &nbsp;m
+                                </p>
+                            </v-col>
+                        </v-row>
+                        <v-row no-gutters align="center" justify="center">
+                            <v-btn
+                                v-if="gps_update === 'RELEASE'"
+                                class="z1"
+                                color="white"
+                                x-large
+                                outlined
+                                raised
+                                elevation="2"
+                                @click="holdGPS"
+                                :disabled="!client.connected"
+                            >
+                                <strong class="bt1">HOLD</strong>
+                            </v-btn>
+                            <v-btn
+                                v-if="gps_update === 'HOLD'"
+                                class="z1"
+                                color="white"
+                                x-large
+                                outlined
+                                raised
+                                elevation="2"
+                                @click="releaseGPS"
+                                :disabled="!client.connected"
+                            >
+                                <strong class="bt1">Release</strong>
+                            </v-btn>
+                        </v-row>
+                    </v-col>
+                </v-row>
+                <v-row no-gutters align="center" justify="end" class="mb-n3">
+                    <v-col cols="3">
+                        <v-card-actions>
+                            <v-btn
+                                color="primary"
+                                text tile
+                                @click="dialog = false"
+                                v-on:keyup.esc="dialog = false"
+                            >
+                                CLOSE
+                            </v-btn>
+                        </v-card-actions>
+                    </v-col>
+                </v-row>
+                <v-snackbar
+                    v-model="snackbar"
+                    :timeout="timeout"
+                    :value="true"
+                    color="rgb(53, 53, 53)"
+                >
+                    {{ text }}
+                </v-snackbar>
+            </v-card>
+        </v-dialog>
 
         <div>
             <v-card-actions>
@@ -694,14 +831,15 @@ export default {
             text: '',
             timeout: 3000,
 
-            tr_state: '',
-            gps_update: false,
+            tr_state: 'ready',
+            gps_update: 'RELEASE',
+            ant_type: "T0",
 
             stop_flag: true,
             tr_run_status: false,
             tr_arrange_status: false,
 
-
+            dialog: false
         };
     },
     methods: {
@@ -826,7 +964,7 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/#";
+                this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pantilt";
 
                 this.offsetTopic = "/Mobius/" + this.connection.gcs + "/Offset_Data/" + this.connection.drone + "/Panel";
 
@@ -879,6 +1017,7 @@ export default {
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[3] === "Tr_Data") {
+                            console.log(message.toString())
                             // {
                             //     "pan_angle" : 359.8595441900111,
                             //     "tilt_angle" : -0.008266449886419495,
@@ -901,7 +1040,20 @@ export default {
                             this.myPan = parseInt(TrData.pan_angle).toFixed(1);
                             this.myTilt = parseInt(TrData.tilt_angle).toFixed(1);
                             this.tr_state = TrData.state.toString();
-                            this.gps_update = JSON.parse(TrData.gps_update.toString());
+                            if (JSON.parse(TrData.gps_update.toString())) {
+                                this.gps_update = 'RELEASE';
+                            }
+                            else {
+                                this.gps_update = "HOLD";
+                            }
+
+                            this.ant_type = TrData.ant_type.toString();
+                            if (this.ant_type === 'T0') {
+                                this.antTypeMsg = 'T90°';
+                            }
+                            else if (this.ant_type === 'T90') {
+                                this.antTypeMsg = 'T0°';
+                            }
 
                             this.myPan = parseInt(this.myPan);
 
@@ -1126,14 +1278,22 @@ export default {
 .b0 {
     width: 100px;
     min-width: 100px;
-    height: 50px;
-    min-height: 50px;
+    height: 88.5px;
+    min-height: 88.5px;
     letter-spacing: 2px;
 }
 
 .z0 {
     width: 50px;
     min-width: 50px;
+    height: 50px;
+    min-height: 50px;
+    letter-spacing: 2px;
+}
+
+.z1 {
+    width: 30px;
+    min-width: 30px;
     height: 50px;
     min-height: 50px;
     letter-spacing: 2px;

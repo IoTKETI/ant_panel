@@ -8,7 +8,7 @@ import App from './App.vue'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import router from './router'
-import axios from 'axios'
+// import axios from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import Vue2TouchEvents from 'vue2-touch-events'
 import Vue3TouchEvents from "vue3-touch-events";
@@ -18,9 +18,9 @@ Vue.use(Vue3TouchEvents);
 Vue.use(Vue2TouchEvents)
 Vue.config.productionTip = false
 
-//전역으로 axios 사용하기 위해 추가하는 구문
-Vue.prototype.$axios = axios
-//다른 컴포넌트에서 import 없이 this.$axios 로 사용 가능
+// //전역으로 axios 사용하기 위해 추가하는 구문
+// Vue.prototype.$axios = axios
+// //다른 컴포넌트에서 import 없이 this.$axios 로 사용 가능
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
