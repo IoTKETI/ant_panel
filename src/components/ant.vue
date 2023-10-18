@@ -27,7 +27,7 @@
                                 touchstart: tiltUp,
                                 touchend: tiltUpStop,
                             }"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -46,15 +46,6 @@
 
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
-                        <!--                        <br/>-->
-                        <!--                        <h2 class="f1aa font-weight-black">Drone name:</h2>-->
-
-                        <!--                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.drone }}</h2>-->
-                        <!--                        <p></p>-->
-                        <!--                        <h2 class="f1aa font-weight-black">System ID:</h2>-->
-
-                        <!--                        <h2 class="f1aa font-weight-black">&nbsp;&nbsp;&nbsp;&nbsp;{{ drone_info.systemid }}</h2>-->
-                        <!--                        <br/>-->
                         <v-btn
                             v-if="!tr_run_status"
                             class="b0"
@@ -65,7 +56,7 @@
                             raised
                             elevation="2"
                             @click="doRun"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <strong class="bt1">RUN</strong>
                         </v-btn>
@@ -79,11 +70,12 @@
                             raised
                             elevation="2"
                             @click="doRun"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || stop_flag"
                         >
                             <strong class="bt1">Stop</strong>
                         </v-btn>
                         <v-btn
+                            v-if="!tr_arrange_status"
                             class="b0 mt-5"
                             color="white"
                             x-large
@@ -92,48 +84,62 @@
                             raised
                             elevation="2"
                             @click="doArrange"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <strong class="bt1">ARRANGE</strong>
                         </v-btn>
+                        <v-btn
+                            v-if="tr_arrange_status"
+                            class="b0 mt-5"
+                            color="white"
+                            x-large
+                            block
+                            outlined
+                            raised
+                            elevation="2"
+                            @click="doArrange"
+                            :disabled="!client.connected || stop_flag"
+                        >
+                            <strong class="bt1">STOP</strong>
+                        </v-btn>
                         <v-row class="mt-n2">
-                            <v-col>
-                                <v-btn
-                                    class="z0 mt-5"
-                                    color="white"
-                                    x-large
-                                    block
-                                    outlined
-                                    raised
-                                    elevation="2"
-                                    @click="doSetOffset"
-                                    :disabled="!client.connected"
-                                >
-                                    <strong class="bt1">offset</strong>
-                                </v-btn>
-                            </v-col>
 <!--                            <v-col>-->
-<!--                                <v-tooltip bottom>-->
-<!--                                    <template v-slot:activator="{ on, attrs }">-->
-<!--                                        <v-btn-->
-<!--                                            class="z0 mt-5"-->
-<!--                                            color="white"-->
-<!--                                            x-large-->
-<!--                                            block-->
-<!--                                            outlined-->
-<!--                                            raised-->
-<!--                                            elevation="2"-->
-<!--                                            v-bind="attrs"-->
-<!--                                            v-on="on"-->
-<!--                                            @click="changeAntType"-->
-<!--                                            :disabled="!client.connected"-->
-<!--                                        >-->
-<!--                                            <strong class="bt1">{{ antTypeMsg }}</strong>-->
-<!--                                        </v-btn>-->
-<!--                                    </template>-->
-<!--                                    <span>{{ antTypeMsg }}으로 변경</span>-->
-<!--                                </v-tooltip>-->
+<!--                                <v-btn-->
+<!--                                    class="z0 mt-5"-->
+<!--                                    color="white"-->
+<!--                                    x-large-->
+<!--                                    block-->
+<!--                                    outlined-->
+<!--                                    raised-->
+<!--                                    elevation="2"-->
+<!--                                    @click="doSetOffset"-->
+<!--                                    :disabled="!client.connected"-->
+<!--                                >-->
+<!--                                    <strong class="bt1">offset</strong>-->
+<!--                                </v-btn>-->
 <!--                            </v-col>-->
+                            <v-col>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            class="z0 mt-5"
+                                            color="white"
+                                            x-large
+                                            block
+                                            outlined
+                                            raised
+                                            elevation="2"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            @click="changeAntType"
+                                            :disabled="!client.connected"
+                                        >
+                                            <strong class="bt1">{{ antTypeMsg }}</strong>
+                                        </v-btn>
+                                    </template>
+                                    <span>{{ antTypeMsg }}으로 변경</span>
+                                </v-tooltip>
+                            </v-col>
                         </v-row>
                     </v-card>
                 </v-col>
@@ -156,7 +162,7 @@
                                 touchstart: panDown,
                                 touchend: panDownStop,
                             }"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -216,7 +222,7 @@
                                 touchstart: panUp,
                                 touchend: panUpStop,
                             }"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -282,40 +288,6 @@
                             >
                             </v-text-field>
                         </v-row>
-
-                        <!--
-                                    <v-row class="mt-n6">
-                                      <v-col>
-                                        <v-btn
-                                          v-if="!client.connected"
-                                          class="bb"
-                                          color="white"
-                                          x-large
-                                          block
-                                          outlined
-                                          raised
-                                          elevation="2"
-                                          @click="setbtn"
-                                        >
-                                          <strong class="bt1">connect</strong>
-                                        </v-btn>
-                                        <v-btn
-                                          v-if="client.connected"
-                                          class="bb"
-                                          color="white"
-                                          x-large
-                                          block
-                                          outlined
-                                          raised
-                                          elevation="2"
-                                          @click="destroyConnection"
-                                        >
-                                          <strong class="bt1">disconnect</strong>
-                                        </v-btn>
-                                      </v-col>
-                                    </v-row>
-
-                                    -->
                     </v-card>
                 </v-col>
 
@@ -335,7 +307,7 @@
                                 touchstart: tiltDown,
                                 touchend: tiltDownStop,
                             }"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || !stop_flag"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -699,7 +671,7 @@ export default {
             },
 
             getDataTopic: {
-                pantilt: "/Mobius/GcsName/Tr_Data/DroneName/pantilt"
+                pantilt: "/Mobius/GcsName/Tr_Data/DroneName/#"
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/DroneName/Panel",
@@ -716,6 +688,7 @@ export default {
             rev_connted: false,
 
             tr_run_status: false,
+            tr_arrange_status: false,
 
             curAlt: null,
             tr_altitude: null,
@@ -728,7 +701,8 @@ export default {
             timeout: 3000,
 
             gps_flag: false,
-            alreadyRun: false
+
+            stop_flag: true,
         };
     },
     methods: {
@@ -744,88 +718,73 @@ export default {
         },
         tiltUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.alreadyRun) {
-                if (this.antTypeFlag) {
-                    this.t_offset = this.myTilt - this.init_t_angle + 90;
-                }
-                else {
-                    this.t_offset = this.myTilt - this.init_t_angle;
-                }
-                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
-            }
+
+            this.stop_flag = true;
         },
         tiltDown: function () {
             this.doPublish(this.motorControlTopic, "tilt_down");
         },
         tiltDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.alreadyRun) {
-                if (this.antTypeFlag) {
-                    this.t_offset = this.myTilt - this.init_t_angle + 90;
-                }
-                else {
-                    this.t_offset = this.myTilt - this.init_t_angle;
-                }
-                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
-            }
+
+            this.stop_flag = true;
         },
         panDown: function () {
             this.doPublish(this.motorControlTopic, "pan_down");
         },
         panDownStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.alreadyRun) {
-                this.p_offset = this.myPan - this.init_p_angle;
-                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
-            }
+
+            this.stop_flag = true;
         },
         panUp: function () {
             this.doPublish(this.motorControlTopic, "pan_up");
         },
         panUpStop: function () {
             this.doPublish(this.motorControlTopic, "stop");
-            if (this.alreadyRun) {
-                this.p_offset = this.myPan - this.init_p_angle;
-                console.log('p_offset - ' + this.p_offset, 't_offset - ' + this.t_offset);
-            }
+
+            this.stop_flag = true;
         },
         doRun: function () {
             this.tr_run_status = !this.tr_run_status;
             this.doPublish(this.motorControlTopic, "run");
-            if (!this.tr_run_status) {
-                if (this.alreadyRun) {
-                    this.init_p_angle = this.myPan;
-                    this.init_t_angle = this.myTilt;
-                    console.log('init_p_angle - ' + this.init_p_angle, 'init_t_angle - ' + this.init_t_angle);
-                }
+            if (this.tr_run_status) {
+                this.stop_flag = !this.tr_run_status;
             }
             else {
-                this.alreadyRun = true;
+                this.stop_flag = !this.tr_run_status;
             }
         },
         doArrange: function () {
-            this.p_offset = 0;
-            this.t_offset = 0;
-            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)}));
+            this.tr_arrange_status = !this.tr_arrange_status;
             this.doPublish(this.motorControlTopic, "arrange");
+            if (this.tr_arrange_status) {
+                this.stop_flag = !this.tr_arrange_status;
+            }
+            else {
+                this.stop_flag = !this.tr_arrange_status;
+            }
         },
         doSetOffset: function () {
-            this.doPublish(this.offsetTopic, JSON.stringify({p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)}));
+            this.doPublish(this.offsetTopic, JSON.stringify({
+                p_offset: -1 * (this.p_offset),
+                t_offset: -1 * (this.t_offset)
+            }));
         },
-        // changeAntType: function () {
-        //     this.antTypeFlag = !this.antTypeFlag;
-        //     // localStorage.setItem("antTypeFlag", this.antTypeFlag);
-        //
-        //     if (this.antTypeFlag) {
-        //         this.antTypeMsg = 'T0°';
-        //         this.doPublish(this.offsetTopic, JSON.stringify({type: 'T90'}));
-        //     }
-        //     else {
-        //         this.antTypeMsg = 'T90°';
-        //         this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
-        //     }
-        //     // localStorage.setItem("antTypeMsg", this.antTypeMsg);
-        // },
+        changeAntType: function () {
+            this.antTypeFlag = !this.antTypeFlag;
+            // localStorage.setItem("antTypeFlag", this.antTypeFlag);
+
+            if (this.antTypeFlag) {
+                this.antTypeMsg = 'T0°';
+                this.doPublish(this.offsetTopic, JSON.stringify({type: 'T90'}));
+            }
+            else {
+                this.antTypeMsg = 'T90°';
+                this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
+            }
+            // localStorage.setItem("antTypeMsg", this.antTypeMsg);
+        },
         setbtn: function () {
             // this.doPublish(this.altTopic, this.altset);
             localStorage.setItem("mobius-host", this.connection.host);
@@ -868,7 +827,7 @@ export default {
                 this.client.loading = true;
                 this.connection.clientId = "mqttjs_" + "jiho" + "_" + nanoid(15);
 
-                this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pantilt";
+                this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/#";
 
                 this.offsetTopic = "/Mobius/" + this.connection.gcs + "/Offset_Data/" + this.connection.drone + "/Panel";
 
@@ -920,11 +879,24 @@ export default {
                         // console.log("Received " + message.toString() + " From " + topic);
 
                         let topic_arr = topic.split("/");
-                        if (topic_arr[topic_arr.length - 1] === "pantilt") {
+                        if (topic_arr[3] === "Tr_Data") {
+                            let TrData = JSON.parse(message.toString());
                             if (!this.gps_flag) {
-                                this.curAlt = JSON.parse(message.toString()).alt;
+                                this.curAlt = TrData.alt;
                             }
-                            this.myPan = parseInt(JSON.parse(message.toString()).pan_angle).toFixed(1);
+                            if (Object.prototype.hasOwnProperty.call(TrData, 'type')) {
+                                if (topic_arr[topic_arr.length - 1] === "pan") {
+                                    this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
+                                }
+                                else if (topic_arr[topic_arr.length - 1] === "tilt") {
+                                    this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
+                                }
+                            }
+                            else {
+                                this.myPan = parseInt(TrData.pan_angle).toFixed(1);
+                                this.myTilt = parseInt(TrData.tilt_angle).toFixed(1);
+                            }
+
                             this.myPan = parseInt(this.myPan);
 
                             if (this.myPan > 0) {
@@ -939,7 +911,6 @@ export default {
                                 this.pPan = 0;
                             }
 
-                            this.myTilt = parseInt(JSON.parse(message.toString()).tilt_angle).toFixed(1);
                             this.myTilt = parseInt(this.myTilt);
 
                             if (this.myTilt > 0) {
@@ -1000,12 +971,13 @@ export default {
                         connected: false,
                         loading: false,
                     };
-                    this.show = false
-                    this.rev_connted = false
-                    this.tr_run_status = false
-                    this.curAlt = null
-                    this.gps_flag = false
-                    this.alreadyRun = false
+                    this.show = false;
+                    this.rev_connted = false;
+                    this.tr_run_status = false;
+                    this.tr_arrange_status = false;
+                    this.curAlt = null;
+                    this.gps_flag = false;
+                    this.stop_flag = true;
                     this.myPan = 0;
                     this.myTilt = 0;
                     console.log(this.connection.host + " - " + this.connection.gcs, "\nSuccessfully disconnected!");
