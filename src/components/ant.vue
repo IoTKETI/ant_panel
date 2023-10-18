@@ -376,6 +376,7 @@
                                 height="50"
                                 elevation="2"
                                 @click="dialog=true"
+                                :disabled="!client.connected"
                             >
                                 <v-icon
                                     color="white"
