@@ -364,7 +364,7 @@
                                     raised
                                     elevation="2"
                                     @click="holdGPS"
-                                    :disabled="gps_flag || !client.connected"
+                                    :disabled="gps_update || !client.connected"
                                 >
                                     <strong class="bt1">HOLD</strong>
                                 </v-btn>
@@ -379,7 +379,7 @@
                                     raised
                                     elevation="2"
                                     @click="releaseGPS"
-                                    :disabled="!gps_flag || !client.connected"
+                                    :disabled="!gps_update || !client.connected"
                                 >
                                     <strong class="bt1">Release</strong>
                                 </v-btn>
@@ -633,9 +633,6 @@ export default {
             myPan: 0,
             myTilt: 0,
 
-            init_p_angle: 0,
-            init_t_angle: 0,
-
             p_offset: 0,
             t_offset: 0,
 
@@ -671,7 +668,7 @@ export default {
             },
 
             getDataTopic: {
-                pantilt: "/Mobius/GcsName/Tr_Data/DroneName/#"
+                pantilt: "/Mobius/GcsName/Tr_Data/DroneName/pantilt"
             },
 
             motorControlTopic: "/Mobius/GcsName/Ctrl_Data/DroneName/Panel",
@@ -687,9 +684,6 @@ export default {
             response_text: "",
             rev_connted: false,
 
-            tr_run_status: false,
-            tr_arrange_status: false,
-
             curAlt: null,
             tr_altitude: null,
             tr_altitude_rule: [
@@ -700,9 +694,14 @@ export default {
             text: '',
             timeout: 3000,
 
-            gps_flag: false,
+            tr_state: '',
+            gps_update: false,
 
             stop_flag: true,
+            tr_run_status: false,
+            tr_arrange_status: false,
+
+
         };
     },
     methods: {
@@ -807,12 +806,12 @@ export default {
                 this.text = '현재 고도(' + this.curAlt + 'm)로 고정합니다.';
             }
             this.snackbar = true;
-            this.gps_flag = true;
+            this.gps_update = true;
         },
         releaseGPS: function () {
             console.log('Release GPS');
             this.doPublish(this.gpsControlTopic, "release");
-            this.gps_flag = false;
+            this.gps_update = false;
             this.text = 'GPS 고정을 해제합니다.';
 
             this.snackbar = true;
@@ -880,22 +879,29 @@ export default {
 
                         let topic_arr = topic.split("/");
                         if (topic_arr[3] === "Tr_Data") {
+                            // {
+                            //     "pan_angle" : 359.8595441900111,
+                            //     "tilt_angle" : -0.008266449886419495,
+                            //     "flag_tracking" : "no",
+                            //     "state" : "arranging",
+                            //     "lat" : 37.4036621604629,
+                            //     "lon" : 127.16176249708046,
+                            //     "alt" : 0,
+                            //     "relative_alt" : 0,
+                            //     "fix_type" : 0,
+                            //     "pan_offset" : 0,
+                            //     "tilt_offset" : 0,
+                            //     "gps_update" : true
+                            // }
                             let TrData = JSON.parse(message.toString());
-                            if (!this.gps_flag) {
+                            if (!this.gps_update) {
                                 this.curAlt = TrData.alt;
                             }
-                            if (Object.prototype.hasOwnProperty.call(TrData, 'type')) {
-                                if (topic_arr[topic_arr.length - 1] === "pan") {
-                                    this.myPan = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
-                                }
-                                else if (topic_arr[topic_arr.length - 1] === "tilt") {
-                                    this.myTilt = parseInt(JSON.parse(message.toString()).angle).toFixed(1);
-                                }
-                            }
-                            else {
-                                this.myPan = parseInt(TrData.pan_angle).toFixed(1);
-                                this.myTilt = parseInt(TrData.tilt_angle).toFixed(1);
-                            }
+
+                            this.myPan = parseInt(TrData.pan_angle).toFixed(1);
+                            this.myTilt = parseInt(TrData.tilt_angle).toFixed(1);
+                            this.tr_state = TrData.state.toString();
+                            this.gps_update = JSON.parse(TrData.gps_update.toString());
 
                             this.myPan = parseInt(this.myPan);
 
@@ -976,7 +982,7 @@ export default {
                     this.tr_run_status = false;
                     this.tr_arrange_status = false;
                     this.curAlt = null;
-                    this.gps_flag = false;
+                    this.gps_update = false;
                     this.stop_flag = true;
                     this.myPan = 0;
                     this.myTilt = 0;
