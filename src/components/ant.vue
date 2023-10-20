@@ -210,6 +210,12 @@
                                 <p class="f2 font-weight-black">GPS</p>
                             </v-col>
                             <v-col>
+                                <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_fixed }}</p>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-n6">
+                            <v-col cols="6">                            </v-col>
+                            <v-col>
                                 <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update }}</p>
                             </v-col>
                         </v-row>
@@ -721,6 +727,7 @@
 import mqtt from "mqtt";
 import {nanoid} from "nanoid";
 import droneinfo from "@/assets/drone_info.json";
+import mavlink from '../js/mavlink'
 
 const data = droneinfo;
 
@@ -835,6 +842,7 @@ export default {
             tr_state: 'ready',
             gps_update: 'RELEASE',
             ant_type: "T0",
+            gps_fixed: "No GPS",
 
             stop_flag: true,
             tr_run_status: false,
@@ -1046,6 +1054,38 @@ export default {
                             }
                             else {
                                 this.gps_update = "HOLD";
+                            }
+
+                            let fix_type = parseInt(TrData.fix_type);
+                            if (fix_type === mavlink.GPS_FIX_TYPE_NO_GPS) {//0 // No GPS connected
+                                this.gps_fixed = 'NO_GPS';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_NO_FIX) {//1 // No position information, GPS is connected
+                                this.gps_fixed = 'NO_FIX';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_2D_FIX) {//2 // 2D position
+                                this.gps_fixed = '2D_FIX';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_3D_FIX) {//3 // 3D position
+                                this.gps_fixed = '3D_FIX';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_DGPS) {//4 // DGPS/SBAS aided 3D position
+                                this.gps_fixed = 'DGPS';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_RTK_FLOAT) {//5 // RTK float, 3D position
+                                this.gps_fixed = 'RTK_FLOAT';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_RTK_FIXED) {//6 // RTK Fixed, 3D position
+                                this.gps_fixed = 'RTK_FIXED';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_STATIC) {//7 // Static fixed, typically used for base stations
+                                this.gps_fixed = 'STATIC';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_PPP) {//8 // PPP, 3D position.
+                                this.gps_fixed = 'PPP';
+                            }
+                            else if (fix_type === mavlink.GPS_FIX_TYPE_ENUM_END) {//9 //
+                                this.gps_fixed = 'ENUM_END';
                             }
 
                             this.ant_type = TrData.ant_type.toString();
