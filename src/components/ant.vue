@@ -27,7 +27,7 @@
                                 touchstart: tiltUp,
                                 touchend: tiltUpStop,
                             }"
-                            :disabled="!client.connected || tr_state !== 'ready'"
+                            :disabled="!client.connected || tr_state === 'arranging' || tr_state === 'run'"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -47,7 +47,7 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <v-btn
-                            v-if="tr_state !== 'run'"
+                            v-if="!tr_run_status"
                             class="b0"
                             color="white"
                             x-large
@@ -61,7 +61,7 @@
                             <strong class="bt1">RUN</strong>
                         </v-btn>
                         <v-btn
-                            v-if="tr_state === 'run'"
+                            v-if="tr_run_status"
                             class="b0"
                             color="white"
                             x-large
@@ -70,9 +70,9 @@
                             raised
                             elevation="2"
                             @click="doRun"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || tr_state === 'arranging'"
                         >
-                            <strong class="bt1">Stop</strong>
+                            <strong class="bt1">STOP</strong>
                         </v-btn>
                         <v-btn
                             v-if="!tr_arrange_status"
@@ -98,7 +98,7 @@
                             raised
                             elevation="2"
                             @click="doArrange"
-                            :disabled="!client.connected"
+                            :disabled="!client.connected || tr_state === 'run'"
                         >
                             <strong class="bt1">STOP</strong>
                         </v-btn>
@@ -162,7 +162,7 @@
                                 touchstart: panDown,
                                 touchend: panDownStop,
                             }"
-                            :disabled="!client.connected || tr_state !== 'ready'"
+                            :disabled="!client.connected || tr_state === 'arranging' || tr_state === 'run'"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -181,42 +181,41 @@
 
                 <v-col>
                     <v-card class="v1" outlined color="transparent" style="height: 100px">
-                        <v-row>
-                            <v-col>
+                        <v-row class="mt-n3" justify="center">
+                            <v-col cols="5.5">
                                 <p class="f2 font-weight-black">PAN</p>
                             </v-col>
                             <v-col>
                                 <p class="f2 font-weight-black">{{ myPan }}</p>
                             </v-col>
                         </v-row>
-                        <v-row class="mt-n6">
-                            <v-col>
+                        <v-row class="mt-n6" justify="center">
+                            <v-col cols="5.5">
                                 <p class="f2 font-weight-black">TILT</p>
                             </v-col>
                             <v-col>
                                 <p class="f2 font-weight-black">{{ myTilt }}</p>
                             </v-col>
                         </v-row>
-                        <v-row class="mt-n6">
-                            <v-col>
-                                <p class="f2 font-weight-black">TYPE</p>
+                        <v-row class="mt-n6" justify="center">
+                            <v-col cols="5.5">
+                                <p class="f2 font-weight-black">ALT</p>
                             </v-col>
                             <v-col>
-                                <p class="f2 font-weight-black">{{ ant_type }}</p>
+                                <p class="f2 font-weight-black">{{ curAlt }}m</p>
                             </v-col>
                         </v-row>
-                        <v-row class="mt-n6">
-                            <v-col>
+                        <v-row class="mt-n6" justify="center" align="center">
+                            <v-col cols="5.5">
                                 <p class="f2 font-weight-black">GPS</p>
                             </v-col>
                             <v-col>
-                                <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_fixed }}</p>
-                            </v-col>
-                        </v-row>
-                        <v-row class="mt-n6">
-                            <v-col cols="6">                            </v-col>
-                            <v-col>
-                                <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update }}</p>
+                                <v-row>
+                                    <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_fixed }}</p>
+                                </v-row>
+                                <v-row class="mt-n3">
+                                    <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update }}</p>
+                                </v-row>
                             </v-col>
                         </v-row>
                     </v-card>
@@ -239,7 +238,7 @@
                                 touchstart: panUp,
                                 touchend: panUpStop,
                             }"
-                            :disabled="!client.connected || tr_state !== 'ready'"
+                            :disabled="!client.connected || tr_state === 'arranging' || tr_state === 'run'"
                         >
                             <v-progress-linear
                                 color="#FF00AA"
@@ -324,7 +323,7 @@
                                 touchstart: tiltDown,
                                 touchend: tiltDownStop,
                             }"
-                            :disabled="!client.connected || tr_state !== 'ready'"
+                            :disabled="!client.connected || tr_state === 'arranging' || tr_state === 'run'"
                         >
                             <v-progress-linear
                                 color="#AAFF00"
@@ -342,13 +341,21 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <br/>
-                        <v-row class="mt-8">
+                        <v-row class="mt-4">
                             <v-row>
-                                <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px">
-                                    Tracker Alt :
+                                <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
+                                    Antenna Type :
                                 </p>
                                 <p class="f1aa-1 mt-n2 font-weight-black" style="font-size: 15px">
-                                    {{ curAlt }} m
+                                    {{ ant_type }}
+                                </p>
+                            </v-row>
+                            <v-row>
+                                <p class="f1aa mt-n3 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
+                                    Motor Speed :
+                                </p>
+                                <p class="f1aa-1 mt-n2 font-weight-black" style="font-size: 15px">
+                                    {{ motorSpeed }}
                                 </p>
                             </v-row>
                             <!--                            <v-row>-->
@@ -370,26 +377,47 @@
 
                         <br/>
                         <p></p>
-                        <v-row
-                            class="justify-end pr-3"
-                        >
-                            <v-btn
-                                color="white"
-                                x-large
-                                outlined
-                                raised
-                                width="20"
-                                height="50"
-                                elevation="2"
-                                @click="dialog=true"
-                                :disabled="!client.connected"
-                            >
-                                <v-icon
-                                    color="white"
-                                    size="30"
-                                >$cogTransfer
-                                </v-icon>
-                            </v-btn>
+                        <v-row class="justify-end pr-3 mt-n4" justify="space-between">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="white"
+                                        outlined
+                                        raised
+                                        width="90"
+                                        height="50"
+                                        elevation="2"
+                                        @click="connectMAVLink"
+                                        :disabled="!client.connected"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        MAVLink
+                                    </v-btn>
+                                </template>
+                                Connect MAVLink
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="white"
+                                        outlined
+                                        raised
+                                        width="20"
+                                        height="50"
+                                        elevation="2"
+                                        @click="dialog=true"
+                                        :disabled="!client.connected"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <v-icon
+                                            color="white"
+                                            size="30"
+                                        >$cogTransfer
+                                        </v-icon>
+                                    </v-btn>
+                                </template>
+                                Settings
+                            </v-tooltip>
                         </v-row>
 
                         <!--                            <v-col>-->
@@ -425,6 +453,14 @@
                     </v-card>
                 </v-col>
             </v-row>
+            <v-snackbar
+                v-model="snackbar"
+                :timeout="timeout"
+                :value="true"
+                color="rgb(53,53,53)"
+            >
+                {{ text }}
+            </v-snackbar>
         </div>
 
         <v-row>
@@ -456,23 +492,6 @@
                     <strong class="bt1">disconnect</strong>
                 </v-btn>
             </v-col>
-
-            <!-- drone info start -->
-
-            <v-col>
-                <v-btn
-                    class=""
-                    color="white"
-                    x-large
-                    block
-                    outlined
-                    raised
-                    elevation="2"
-                    @click="show = !show"
-                >
-                    <strong class="bt1">Drone Information</strong>
-                </v-btn>
-            </v-col>
         </v-row>
 
         <v-dialog
@@ -488,7 +507,7 @@
                     <v-col cols="6">
                         <v-row no-gutters align="center" justify="center" style="height: 60px">
                             <p class="f1aa font-weight-black text-end" style="font-size: 15px">
-                                ANTENA TYPE :
+                                antenna TYPE :
                             </p>
                         </v-row>
                         <v-row no-gutters align="center" justify="center" style="height: 60px">
@@ -502,21 +521,32 @@
                                 GPS HOLD :
                             </p>
                         </v-row>
+                        <v-row no-gutters align="center" justify="center" style="height: 60px">
+                            <p class="f1aa font-weight-black text-end" style="font-size: 15px">
+                                Motor speed :
+                            </p>
+                        </v-row>
                     </v-col>
                     <v-col cols="6">
                         <v-row no-gutters align="center" justify="center" class="mt-n5">
-                            <v-btn
-                                class="z1"
-                                color="white"
-                                x-large
-                                outlined
-                                raised
-                                elevation="2"
-                                @click="changeAntType"
-                                :disabled="!client.connected"
-                            >
-                                <strong class="bt1">{{ antTypeMsg }}</strong>
-                            </v-btn>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        class="z1"
+                                        color="white"
+                                        x-large
+                                        outlined
+                                        raised
+                                        elevation="2"
+                                        @click="changeAntType"
+                                        :disabled="!client.connected"
+                                        v-bind="attrs"
+                                        v-on="on">
+                                        <strong class="bt1">{{ antTypeMsg }}</strong>
+                                    </v-btn>
+                                </template>
+                                Change antenna type to {{ antTypeMsg }}
+                            </v-tooltip>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
                             <v-col cols="6">
@@ -536,36 +566,100 @@
                             </v-col>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
-                            <v-btn
-                                v-if="gps_update === 'RELEASE'"
-                                class="z1"
-                                color="white"
-                                x-large
-                                outlined
-                                raised
-                                elevation="2"
-                                @click="holdGPS"
-                                :disabled="!client.connected"
-                            >
-                                <strong class="bt1">HOLD</strong>
-                            </v-btn>
-                            <v-btn
-                                v-if="gps_update === 'HOLD'"
-                                class="z1"
-                                color="white"
-                                x-large
-                                outlined
-                                raised
-                                elevation="2"
-                                @click="releaseGPS"
-                                :disabled="!client.connected"
-                            >
-                                <strong class="bt1">Release</strong>
-                            </v-btn>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        v-if="gps_update === 'RELEASE'"
+                                        class="z1"
+                                        color="white"
+                                        x-large
+                                        outlined
+                                        raised
+                                        elevation="2"
+                                        @click="holdGPS"
+                                        :disabled="!client.connected"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        <strong class="bt1">HOLD</strong>
+                                    </v-btn>
+                                </template>
+                                Change to GPS Hold
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        v-if="gps_update === 'HOLD'"
+                                        class="z1"
+                                        color="white"
+                                        x-large
+                                        outlined
+                                        raised
+                                        elevation="2"
+                                        @click="releaseGPS"
+                                        :disabled="!client.connected"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        <strong class="bt1">Release</strong>
+                                    </v-btn>
+                                </template>
+                                Change to GPS Release
+                            </v-tooltip>
+                        </v-row>
+                        <v-row no-gutters align="center" justify="center">
+                            <v-col cols="8">
+                                <v-text-field
+                                    class="text-white"
+                                    label=""
+                                    color="white"
+                                    v-model="tr_speed"
+                                >
+                                </v-text-field>
+                            </v-col>
+                            <v-col>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            class="z1"
+                                            color="white"
+                                            outlined
+                                            raised
+                                            elevation="2"
+                                            @click="changeSpeed"
+                                            :disabled="!client.connected"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                            <v-icon>$progressUpload</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    Change speed to {{ tr_speed }}
+                                </v-tooltip>
+                            </v-col>
                         </v-row>
                     </v-col>
                 </v-row>
-                <v-row no-gutters align="center" justify="end" class="mb-n3">
+                <v-row no-gutters align="center" justify="space-between" class="mb-n3">
+                    <v-col cols="3">
+                        <v-card-actions>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="primary"
+                                        text tile
+                                        @click="dr_info_dialog = true"
+                                        v-on:keyup.esc="dr_info_dialog = true"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        <v-icon>$clipboardeditoutline</v-icon>
+                                    </v-btn>
+                                </template>
+                                Edit drone information
+                            </v-tooltip>
+                        </v-card-actions>
+                    </v-col>
                     <v-col cols="3">
                         <v-card-actions>
                             <v-btn
@@ -579,147 +673,131 @@
                         </v-card-actions>
                     </v-col>
                 </v-row>
-                <v-snackbar
-                    v-model="snackbar"
-                    :timeout="timeout"
-                    :value="true"
-                    color="rgb(53, 53, 53)"
-                >
-                    {{ text }}
-                </v-snackbar>
             </v-card>
         </v-dialog>
 
-        <div>
-            <v-card-actions>
-                <v-row></v-row>
-                <v-spacer></v-spacer>
-            </v-card-actions>
 
-            <br/>
-            <v-card class="mx-auto" max-width="1300" color="transparent">
-                <v-expand-transition>
-                    <div v-show="show">
-                        <v-card
-                            class="pa-10 white--text"
+        <v-dialog
+            v-model="dr_info_dialog"
+            max-width="700"
+            dark
+        >
+            <v-card
+                class="pa-10 black--text"
+                outlined
+                shaped
+                elevation="3"
+                color="#535353"
+            >
+                <v-row>
+                    <v-col>
+                        <p class="f0" style="color:white">Drone Information</p>
+                    </v-col>
+                    <v-col cols=""></v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="">
+                        <v-text-field
+                            class="black--text"
+                            label="ID :"
+                            v-model="drone_info.id"
+                            :rules="id_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+
+                        <!-- 수정필요 approval gcs, v-model , rules-->
+                        <v-text-field
+                            class="text-black"
+                            label="APPROVAL GCS :"
+                            v-model="drone_info.approval_gcs"
+                            :rules="gcs_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+
+                        <v-text-field
+                            class="text-black"
+                            label="HOST :"
+                            v-model="drone_info.host"
+                            :rules="host_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+
+                        <v-text-field
+                            class="text-black"
+                            label="DRONE :"
+                            v-model="drone_info.drone"
+                            :rules="drone_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+                    </v-col>
+
+                    <v-col cols="">
+                        <v-text-field
+                            class="text-black"
+                            label="GCS :"
+                            v-model="drone_info.gcs"
+                            :rules="gcs_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+                        <v-text-field
+                            class="text-black"
+                            label="TYPE :"
+                            v-model="drone_info.type"
+                            :rules="type_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+                        <v-text-field
+                            class="text-black"
+                            label="SYSTEM ID :"
+                            v-model="drone_info.systemid"
+                            :rules="systemid_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+                        <v-text-field
+                            class="text-black"
+                            label="GCS IP :"
+                            v-model="drone_info.gcsip"
+                            :rules="gcsip_rule"
+                            model-value=""
+                            prefix=" "
+                            color="black"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <br/>
+                <v-row>
+                    <v-col></v-col>
+                    <v-col>
+                        <v-btn
+                            class="sb"
+                            x-large
+                            block
                             outlined
-                            shaped
-                            elevation="3"
-                            color="white"
+                            raised
+                            elevation="2"
+                            @click="savebtn"
                         >
-                            <v-row>
-                                <v-col>
-                                    <p class="f0 font-weight-black">Drone Information</p>
-                                </v-col>
-                                <v-col cols=""></v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col cols="">
-                                    <v-text-field
-                                        class="black--text"
-                                        label="ID :"
-                                        v-model="drone_info.id"
-                                        :rules="id_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-
-                                    <!-- 수정필요 approval gcs, v-model , rules-->
-                                    <v-text-field
-                                        class="text-black"
-                                        label="APPROVAL GCS :"
-                                        v-model="drone_info.approval_gcs"
-                                        :rules="gcs_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-
-                                    <v-text-field
-                                        class="text-black"
-                                        label="HOST :"
-                                        v-model="drone_info.host"
-                                        :rules="host_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-
-                                    <v-text-field
-                                        class="text-black"
-                                        label="DRONE :"
-                                        v-model="drone_info.drone"
-                                        :rules="drone_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-                                </v-col>
-
-                                <v-col cols="">
-                                    <v-text-field
-                                        class="text-black"
-                                        label="GCS :"
-                                        v-model="drone_info.gcs"
-                                        :rules="gcs_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-                                    <v-text-field
-                                        class="text-black"
-                                        label="TYPE :"
-                                        v-model="drone_info.type"
-                                        :rules="type_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-                                    <v-text-field
-                                        class="text-black"
-                                        label="SYSTEM ID :"
-                                        v-model="drone_info.systemid"
-                                        :rules="systemid_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-                                    <v-text-field
-                                        class="text-black"
-                                        label="GCS IP :"
-                                        v-model="drone_info.gcsip"
-                                        :rules="gcsip_rule"
-                                        model-value=""
-                                        prefix=" "
-                                        color="black"
-                                    ></v-text-field>
-                                </v-col>
-                            </v-row>
-                            <br/>
-                            <v-row>
-                                <v-col></v-col>
-                                <v-col>
-                                    <v-btn
-                                        class="sb"
-                                        x-large
-                                        block
-                                        outlined
-                                        raised
-                                        elevation="2"
-                                        @click="savebtn"
-                                    >
-                                        <strong class="bt0">SAVE</strong>
-                                    </v-btn>
-                                </v-col>
-                                <v-col></v-col>
-                            </v-row>
-                        </v-card>
-                    </div>
-                </v-expand-transition>
+                            <strong class="bt0" style="color:white">SAVE</strong>
+                        </v-btn>
+                    </v-col>
+                    <v-col></v-col>
+                </v-row>
             </v-card>
-            <br/>
-        </div>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -728,6 +806,7 @@ import mqtt from "mqtt";
 import {nanoid} from "nanoid";
 import droneinfo from "@/assets/drone_info.json";
 import mavlink from '../js/mavlink'
+import dgram from "dgram";
 
 const data = droneinfo;
 
@@ -737,19 +816,17 @@ export default {
 
     data() {
         return {
-            show: false,
-            selected: "",
             data,
 
             drone_info: localStorage.getItem("drone_info") ? JSON.parse(localStorage.getItem("drone_info")) : {
-                id: "Mercury",
-                approval_gcs: "",
-                host: "121.137.228.240",
-                drone: "KETI_AIoT_02",
-                gcs: "KETI_MUV",
+                id: "UA",
+                approval_gcs: "MUV",
+                host: "gcs.iotocean.org",
+                drone: "KETI_Simul_1",
+                gcs: "KETI_GCS",
                 type: "ardupilot",
-                systemid: "202",
-                gcsip: "192.168.202.150",
+                systemid: "105",
+                gcsip: "192.168.105.150",
             },
 
             id_rule: [(v) => !!v || "ID 값은 필수 입력사항입니다."],
@@ -768,13 +845,6 @@ export default {
 
             interval: {},
 
-            //location data
-            loca_obj: {
-                myLatitude: 37.403625,
-                myLongitude: 127.16177,
-                myAltitude: 0,
-            },
-
             myPan: 0,
             myTilt: 0,
 
@@ -787,8 +857,6 @@ export default {
             pTilt: 0,
             nTilt: 0,
 
-            // antTypeFlag: localStorage.getItem("antTypeFlag") ? localStorage.getItem("antTypeFlag") : false,
-            // antTypeMsg: localStorage.getItem("antTypeMsg") ? localStorage.getItem("antTypeMsg") : 'T+90°',
             antTypeFlag: false,
             antTypeMsg: 'T90°',
 
@@ -812,6 +880,27 @@ export default {
                 password: "keti_muv",
             },
 
+            tr_client: {
+                connected: false,
+                loading: false,
+            },
+            tr_connection: {
+                host: localStorage.getItem("mobius-host") ? localStorage.getItem("mobius-host") : "",
+                gcs: localStorage.getItem("mobius-gcs") ? localStorage.getItem("mobius-gcs") : "",
+                drone: localStorage.getItem("mobius-drone") ? localStorage.getItem("mobius-drone") : "",
+                port: 8883,
+                endpoint: "",
+                clean: true,
+                reconnectPeriod: 2 * 1000,
+                connectTimeout: 30 * 1000,
+                queueQoSZero: false,
+                clientId: "jiho_" + nanoid(15),
+                username: "keti_muv",
+                password: "keti_muv",
+            },
+            getDroneDataTopic: "/Mobius/GcsName/Drone_Data/DroneName/Panel",
+            TrCmdDataTopic: "/Mobius/GcsName/TrCmd_Data/DroneName/Panel",
+
             getDataTopic: {
                 pantilt: "/Mobius/GcsName/Tr_Data/DroneName/pantilt"
             },
@@ -820,16 +909,11 @@ export default {
             offsetTopic: "/Mobius/GcsName/Offset_Data/DroneName/Panel",
             gpsControlTopic: "/Mobius/GcsName/Gps_Ctrl_Data/DroneName/Panel",
             altTopic: "/Mobius/GcsName/Alt_Data/DroneName/Panel",
+            speedTopic: "/Mobius/GcsName/Speed_Data/DroneName/Panel",
 
             droneTopic: "/Mobius/GcsName/Drinfo_Data/Panel",
 
-            console_text_message: "",
-            chk: "",
-
-            response_text: "",
-            rev_connted: false,
-
-            curAlt: null,
+            curAlt: 0,
             tr_altitude: null,
             tr_altitude_rule: [
                 v => /^[.0-9]*$/.test(v) || 'Only numbers.'
@@ -844,82 +928,66 @@ export default {
             ant_type: "T0",
             gps_fixed: "No GPS",
 
-            stop_flag: true,
             tr_run_status: false,
             tr_arrange_status: false,
 
-            dialog: false
+            mavlink_connect: false,
+
+            motorSpeed: 8.8 * 4,
+            tr_speed: 0,
+            arrangeBtnMsg: 'ARRANGE',
+            runBtnMsg: 'RUN',
+
+            dialog: false,
+            dr_info_dialog: false,
+
+            mavUdpComLink: {},
         };
     },
     methods: {
-        savebtn: function () {
-            this.show = !this.show;
+        savebtn() {
             console.log(JSON.stringify(this.drone_info));
             localStorage.setItem("drone_info", JSON.stringify(this.drone_info))
             this.doPublish(this.droneTopic, JSON.stringify(this.drone_info));
         },
 
-        tiltUp: function () {
+        tiltUp() {
             this.doPublish(this.motorControlTopic, "tilt_up");
         },
-        tiltUpStop: function () {
+        tiltUpStop() {
             this.doPublish(this.motorControlTopic, "stop");
-
-            this.stop_flag = true;
         },
-        tiltDown: function () {
+        tiltDown() {
             this.doPublish(this.motorControlTopic, "tilt_down");
         },
-        tiltDownStop: function () {
+        tiltDownStop() {
             this.doPublish(this.motorControlTopic, "stop");
-
-            this.stop_flag = true;
         },
-        panDown: function () {
+        panDown() {
             this.doPublish(this.motorControlTopic, "pan_down");
         },
-        panDownStop: function () {
+        panDownStop() {
             this.doPublish(this.motorControlTopic, "stop");
-
-            this.stop_flag = true;
         },
-        panUp: function () {
+        panUp() {
             this.doPublish(this.motorControlTopic, "pan_up");
         },
-        panUpStop: function () {
+        panUpStop() {
             this.doPublish(this.motorControlTopic, "stop");
-
-            this.stop_flag = true;
         },
-        doRun: function () {
-            this.tr_run_status = !this.tr_run_status;
+        doRun() {
             this.doPublish(this.motorControlTopic, "run");
-            if (this.tr_run_status) {
-                this.stop_flag = !this.tr_run_status;
-            }
-            else {
-                this.stop_flag = !this.tr_run_status;
-            }
         },
-        doArrange: function () {
-            this.tr_arrange_status = !this.tr_arrange_status;
+        doArrange() {
             this.doPublish(this.motorControlTopic, "arrange");
-            if (this.tr_arrange_status) {
-                this.stop_flag = !this.tr_arrange_status;
-            }
-            else {
-                this.stop_flag = !this.tr_arrange_status;
-            }
         },
-        doSetOffset: function () {
+        doSetOffset() {
             this.doPublish(this.offsetTopic, JSON.stringify({
-                p_offset: -1 * (this.p_offset),
-                t_offset: -1 * (this.t_offset)
+                p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)
             }));
         },
-        changeAntType: function () {
+        changeAntType() {
             this.antTypeFlag = !this.antTypeFlag;
-            // localStorage.setItem("antTypeFlag", this.antTypeFlag);
 
             if (this.antTypeFlag) {
                 this.antTypeMsg = 'T0°';
@@ -929,17 +997,18 @@ export default {
                 this.antTypeMsg = 'T90°';
                 this.doPublish(this.offsetTopic, JSON.stringify({type: "T0"}));
             }
-            // localStorage.setItem("antTypeMsg", this.antTypeMsg);
         },
-        setbtn: function () {
-            // this.doPublish(this.altTopic, this.altset);
+        setbtn() {
             localStorage.setItem("mobius-host", this.connection.host);
             localStorage.setItem("mobius-gcs", this.connection.gcs);
             localStorage.setItem("mobius-drone", this.connection.drone);
 
             this.createConnection();
         },
-        holdGPS: function () {
+        changeSpeed() {
+            this.doPublish(this.speedTopic, this.tr_speed.toString());
+        },
+        holdGPS() {
             if (this.tr_altitude) {
                 console.log('Hold GPS\n', 'Tracker Altitude -', this.tr_altitude + 'm');
 
@@ -954,16 +1023,21 @@ export default {
             }
             this.snackbar = true;
             this.gps_update = true;
+            setTimeout(() => {
+                this.snackbar = false;
+            }, 3000);
         },
-        releaseGPS: function () {
+        releaseGPS() {
             console.log('Release GPS');
             this.doPublish(this.gpsControlTopic, "release");
             this.gps_update = false;
             this.text = 'GPS 고정을 해제합니다.';
 
             this.snackbar = true;
+            setTimeout(() => {
+                this.snackbar = false;
+            }, 3000);
         },
-
         createConnection() {
             if (this.client.connected) {
                 this.destroyConnection();
@@ -979,6 +1053,7 @@ export default {
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/" + this.connection.drone + "/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/" + this.connection.drone + "/Panel";
+                this.speedTopic = "/Mobius/" + this.connection.gcs + "/Speed_Data/" + this.connection.drone + "/Panel";
                 this.droneTopic = "/Mobius/" + this.connection.gcs + "/Drinfo_Data/" + this.connection.drone + "/Panel";
 
                 console.log("Host is : " + this.connection.host);
@@ -994,17 +1069,6 @@ export default {
                         this.client.loading = false;
 
                         this.doSubscribe(this.getDataTopic.pantilt);
-
-                        //console.log("myTilt: " + this.myTilt);
-
-                        // let subtopic = "/oneM2M/req/Mobius2/" + "Sketi" + "/#";
-                        //
-                        // this.doUnSubscribe(subtopic);
-                        //
-                        // setTimeout(() => {
-                        //     this.doSubscribe(subtopic);
-                        //     console.log("Subscribe to ", subtopic);
-                        // }, 200);
                     });
 
                     this.client.on("error", (error) => {
@@ -1027,28 +1091,34 @@ export default {
                         let topic_arr = topic.split("/");
                         if (topic_arr[3] === "Tr_Data") {
                             console.log(message.toString())
-                            // {
-                            //     "pan_angle" : 359.8595441900111,
-                            //     "tilt_angle" : -0.008266449886419495,
-                            //     "flag_tracking" : "no",
-                            //     "state" : "arranging",
-                            //     "lat" : 37.4036621604629,
-                            //     "lon" : 127.16176249708046,
-                            //     "alt" : 0,
-                            //     "relative_alt" : 0,
-                            //     "fix_type" : 0,
-                            //     "pan_offset" : 0,
-                            //     "tilt_offset" : 0,
-                            //     "gps_update" : true
-                            // }
                             let TrData = JSON.parse(message.toString());
-                            if (!this.gps_update) {
+                            if (this.gps_update === "RELEASE") {
                                 this.curAlt = TrData.alt;
                             }
 
-                            this.myPan = parseInt(TrData.pan_angle).toFixed(1);
-                            this.myTilt = parseInt(TrData.tilt_angle).toFixed(1);
+                            this.myPan = TrData.pan_angle.toFixed(1);
+                            this.myTilt = TrData.tilt_angle.toFixed(1);
+
                             this.tr_state = TrData.state.toString();
+                            if (this.tr_state === 'arranging') {
+                                this.arrangeBtnMsg === 'STOP';
+                                this.tr_arrange_status = true;
+                            }
+                            else if (this.tr_state === 'run') {
+                                this.runBtnMsg === 'STOP';
+                                this.tr_run_status = true;
+                            }
+                            else {
+                                this.arrangeBtnMsg === 'ARRANGE';
+                                this.runBtnMsg === 'RUN';
+                                this.tr_arrange_status = false;
+                                this.tr_run_status = false;
+                            }
+
+                            let motor_speed = parseFloat(TrData.speed).toFixed(2);
+                            if (this.motorSpeed !== motor_speed) {
+                                this.motorSpeed = motor_speed;
+                            }
                             if (JSON.parse(TrData.gps_update.toString())) {
                                 this.gps_update = 'RELEASE';
                             }
@@ -1096,8 +1166,6 @@ export default {
                                 this.antTypeMsg = 'T0°';
                             }
 
-                            this.myPan = parseInt(this.myPan);
-
                             if (this.myPan > 0) {
                                 this.pPan = (this.myPan / 360) * 100;
                                 this.pPan = parseInt(this.pPan);
@@ -1109,8 +1177,6 @@ export default {
                                 this.nPan = parseInt(this.nPan);
                                 this.pPan = 0;
                             }
-
-                            this.myTilt = parseInt(this.myTilt);
 
                             if (this.myTilt > 0) {
                                 this.pTilt = (this.myTilt / 360) * 100;
@@ -1170,15 +1236,27 @@ export default {
                         connected: false,
                         loading: false,
                     };
-                    this.show = false;
-                    this.rev_connted = false;
+
+                    this.mavUdpComLink[this.connection.drone].socket.close();
+
                     this.tr_run_status = false;
                     this.tr_arrange_status = false;
-                    this.curAlt = null;
-                    this.gps_update = false;
-                    this.stop_flag = true;
+                    this.curAlt = 0;
+                    this.tr_altitude = 0;
+                    this.tr_state = 'ready';
+                    this.gps_update = 'RELEASE';
+                    this.ant_type = "T0";
+                    this.gps_fixed = "No GPS";
                     this.myPan = 0;
                     this.myTilt = 0;
+                    this.tr_speed = 0;
+                    this.motorSpeed = 8.88 * 4;
+                    this.arrangeBtnMsg = "ARRANGE";
+                    this.runBtnMsg = "RUN";
+                    this.mavlink_connect = false;
+                    this.dialog = false;
+                    this.dr_info_dialog = false;
+                    this.mavUdpComLink = {};
                     console.log(this.connection.host + " - " + this.connection.gcs, "\nSuccessfully disconnected!");
                 }
                 catch (error) {
@@ -1186,19 +1264,165 @@ export default {
                 }
             }
         },
-    },
-    created() {
-        // this.createConnection();
+
+        connectMAVLink() {
+            this.mavlink_connect = !this.mavlink_connect;
+            if (this.mavlink_connect) {
+                this.tr_createConnection();
+            }
+            else {
+                if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, this.connection.drone)) {
+                    this.mavUdpComLink[this.connection.drone].socket.close();
+                }
+                this.tr_destroyConnection();
+            }
+        },
+        createUdpCommLink(dName, port) {
+            if (!Object.prototype.hasOwnProperty.call(this.mavUdpComLink, dName)) {
+                let udpSocket = dgram.createSocket('udp4');
+
+                udpSocket.id = dName;
+
+                this.mavUdpComLink[dName] = {};
+                this.mavUdpComLink[dName].socket = udpSocket;
+                this.mavUdpComLink[dName].port = port;
+
+                console.log('UDP socket created on port ' + port + ' [' + dName + ']');
+
+                udpSocket.on('message', (msg) => {
+                    this.tr_doPublish(this.TrCmdDataTopic, msg)
+                });
+
+                udpSocket.on('close', () => {
+                    console.log('close');
+
+                    if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, this.id)) {
+                        delete this.mavUdpComLink[this.id];
+                    }
+                });
+            }
+        },
+        tr_createConnection() {
+            if (this.tr_client.connected) {
+                this.tr_destroyConnection();
+            }
+
+            if (!this.tr_client.connected) {
+                this.tr_client.loading = true;
+                this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
+
+                this.getDroneDataTopic = "/Mobius/" + this.connection.gcs + "/Drone_Data/" + this.connection.drone + "/Panel";
+                this.TrCmdDataTopic = "/Mobius/" + this.connection.gcs + "/TrCmd_Data/" + this.connection.drone + "/Panel";
+
+                console.log("Tracker host is : " + this.connection.host);
+                if (this.connection.host.includes('192.168.')) {
+                    this.createUdpCommLink(this.connection.drone, 11000 + 254);
+
+                    const {host, port, endpoint, ...options} = this.tr_connection;
+                    const connectUrl = `ws://${host}:${port}${endpoint}`;
+                    try {
+                        this.tr_client = mqtt.connect(connectUrl, options);
+
+                        this.tr_client.on("connect", () => {
+                            console.log(connectUrl, "Connection succeeded!");
+
+                            this.tr_client.connected = true;
+                            this.tr_client.loading = false;
+
+                            this.tr_doSubscribe(this.getDroneDataTopic);
+                        });
+
+                        this.tr_client.on("error", (error) => {
+                            console.log("tr_Connection failed", error);
+
+                            this.tr_destroyConnection();
+                        });
+
+                        this.tr_client.on("close", () => {
+                            console.log("tr_Connection closed");
+
+                            this.tr_destroyConnection();
+
+                            this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
+                        });
+
+                        this.tr_client.on("message", (topic, message) => {
+                            // console.log("Received " + message.toString() + " From " + topic);
+
+                            let topic_arr = topic.split("/");
+                            if (topic_arr[3] === "Drone_Data") {
+                                if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, topic_arr[4])) {
+                                    this.mavUdpComLink[topic_arr[4]].socket.send(message, this.mavUdpComLink[topic_arr[4]].port, 'localhost', (error) => {
+                                        if (error) {
+                                            this.mavUdpComLink[topic_arr[4]].socket.close();
+                                            console.log('udpCommLink[' + topic_arr[4] + '].socket is closed');
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    catch (error) {
+                        console.log("tr_mqtt.connect error", error);
+                        this.tr_client.connected = false;
+
+                        setTimeout(this.tr_createConnection, 2000);
+                    }
+                }
+                else {
+                    this.text = '트래커와 이더넷으로 연결해주세요.';
+                    this.snackbar = true;
+                    setTimeout(() => {
+                        this.snackbar = false;
+                    }, 3000);
+                }
+            }
+        },
+
+        tr_doSubscribe(topic) {
+            if (this.tr_client.connected) {
+                const qos = 0;
+                this.tr_client.subscribe(topic, {qos}, (error) => {
+                    if (error) {
+                        console.log("tr_Subscribe to topics error", error);
+                        return;
+                    }
+
+                    console.log("tr_Subscribe to topics (", topic, ")");
+                });
+            }
+        },
+
+        tr_doPublish(topic, payload) {
+            if (this.tr_client.connected) {
+                this.tr_client.publish(topic, payload, 0, (error) => {
+                    if (error) {
+                        console.log("tr_Publish error", error);
+                    }
+                });
+                console.log('tr_publish', topic, payload)
+            }
+        },
+
+        tr_destroyConnection() {
+            if (this.tr_client.connected) {
+                try {
+                    if (Object.hasOwnProperty.call(this.tr_client, "__ob__")) {
+                        this.tr_client.end();
+                    }
+                    this.tr_client = {
+                        connected: false,
+                        loading: false,
+                    };
+                    console.log(this.tr_connection.host + " - " + this.tr_connection.gcs, "\nSuccessfully tr_disconnected!");
+                }
+                catch (error) {
+                    console.log("tr_Disconnect failed", error.toString());
+                }
+            }
+        },
     },
 
-    mounted() {
-        this.interval = setInterval(() => {
-            if (this.value === 100) {
-                return (this.value = 0);
-            }
-            this.value += 10;
-        }, 2000);
-    },
     beforeDestroy() {
         this.destroyConnection();
     },
