@@ -341,7 +341,7 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <br/>
-                        <v-row class="mt-4">
+                        <v-row class="mt-2">
                             <v-row>
                                 <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
                                     Antenna Type :
@@ -390,7 +390,9 @@
                                         @click="connectMAVLink"
                                         :disabled="!client.connected"
                                         v-bind="attrs"
-                                        v-on="on">
+                                        v-on="on"
+                                        style="text-transform: unset"
+                                    >
                                         MAVLink
                                     </v-btn>
                                 </template>
@@ -630,11 +632,12 @@
                                             :disabled="!client.connected"
                                             v-bind="attrs"
                                             v-on="on"
+                                            style="text-transform: unset"
                                         >
-                                            <v-icon>$progressUpload</v-icon>
+                                            {{ mSpeedMsg.toLowerCase() }}
                                         </v-btn>
                                     </template>
-                                    Change speed to {{ tr_speed }}
+                                    모터 속도를 {{ speedCount + 1 }}배속({{ (parseFloat(tr_speed) + 8.88).toFixed(2) }})으로 변경
                                 </v-tooltip>
                             </v-col>
                         </v-row>
@@ -858,7 +861,7 @@ export default {
             nTilt: 0,
 
             antTypeFlag: false,
-            antTypeMsg: 'T90°',
+            antTypeMsg: '',
 
             // mqtt 연결부
             client: {
@@ -933,10 +936,13 @@ export default {
 
             mavlink_connect: false,
 
-            motorSpeed: 8.8 * 4,
-            tr_speed: 0,
+            motorSpeed: 0,
+            tr_speed: 8.88,
+            speedCount: 1,
+
             arrangeBtnMsg: 'ARRANGE',
             runBtnMsg: 'RUN',
+            mSpeedMsg: '1x',
 
             dialog: false,
             dr_info_dialog: false,
@@ -1006,6 +1012,13 @@ export default {
             this.createConnection();
         },
         changeSpeed() {
+            this.speedCount++;
+            if (this.speedCount > 5) {
+                this.speedCount = 1;
+            }
+            this.tr_speed = (8.88 * this.speedCount).toFixed(2);
+            this.mSpeedMsg = this.speedCount.toString() + 'x';
+
             this.doPublish(this.speedTopic, this.tr_speed.toString());
         },
         holdGPS() {
@@ -1370,7 +1383,7 @@ export default {
                     }
                 }
                 else {
-                    this.text = '트래커와 이더넷으로 연결해주세요.';
+                    this.text = '트래커와 이더넷으로 연결하세요.';
                     this.snackbar = true;
                     setTimeout(() => {
                         this.snackbar = false;
@@ -1422,7 +1435,17 @@ export default {
             }
         },
     },
-
+    watch: {
+        motorSpeed(nVal) {
+            this.tr_speed = nVal;
+            this.speedCount = parseInt(nVal / 8.88);
+            this.mSpeedMsg = this.speedCount.toString() + 'x';
+        },
+        tr_speed(nVal) {
+            this.speedCount = parseInt(nVal / 8.88);
+            this.mSpeedMsg = this.speedCount.toString() + 'x';
+        }
+    },
     beforeDestroy() {
         this.destroyConnection();
     },
