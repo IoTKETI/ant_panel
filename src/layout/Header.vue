@@ -1,15 +1,24 @@
 <template>
     <div class="header">
         <v-container>
-
-
+<!--            <v-navigation-drawer-->
+<!--                fixed-->
+<!--                right-->
+<!--                v-model="drawer"-->
+<!--                :color="color"-->
+<!--                src="../assets/blackwhite.png"-->
+<!--                :expand-on-hover="expandOnHover"-->
+<!--                :mini-variant="miniVariant"-->
+<!--                :top="right"-->
+<!--                :permanent="permanent"-->
+<!--                dark-->
+<!--            >-->
             <v-navigation-drawer
                 fixed
                 right
                 v-model="drawer"
                 :color="color"
                 src="../assets/blackwhite.png"
-                :expand-on-hover="expandOnHover"
                 :mini-variant="miniVariant"
                 :top="right"
                 :permanent="permanent"
