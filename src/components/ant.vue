@@ -538,24 +538,38 @@
                     </v-col>
                     <v-col cols="6">
                         <v-row no-gutters align="center" justify="center" class="mt-n5">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn
-                                        class="z1"
-                                        color="white"
-                                        x-large
-                                        outlined
-                                        raised
-                                        elevation="2"
-                                        @click="changeAntType"
-                                        :disabled="!client.connected"
-                                        v-bind="attrs"
-                                        v-on="on">
-                                        <strong class="bt1">{{ antTypeMsg }}<v-icon>$reload</v-icon></strong>
-                                    </v-btn>
-                                </template>
-                                Change antenna type to "{{ antTypeMsg }}"
-                            </v-tooltip>
+                            <v-col cols="8">
+                                <v-btn
+                                    class="z1"
+                                    color="white"
+                                    x-large
+                                    outlined
+                                    raised
+                                    elevation="2"
+                                    @click="changeAntType"
+                                    :disabled="!client.connected">
+                                    <strong class="bt1">{{ antTypeMsg }}</strong>
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            class="z1"
+                                            color="white"
+                                            outlined
+                                            raised
+                                            elevation="2"
+                                            @click="changeAntType"
+                                            :disabled="!client.connected"
+                                            v-bind="attrs"
+                                            v-on="on">
+                                            <v-icon>$reload</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    Change antenna type to "{{ antTypeMsg }}"
+                                </v-tooltip>
+                            </v-col>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
                             <v-col cols="7">
@@ -591,7 +605,7 @@
                                             <v-icon>$forward</v-icon>
                                         </v-btn>
                                     </template>
-                                    오프셋 고도를 {{ offset_alt}}로 변경
+                                    오프셋 고도를 {{ offset_alt }}로 변경
                                 </v-tooltip>
                             </v-col>
                         </v-row>
@@ -1126,6 +1140,7 @@ export default {
 
                             this.myPan = TrData.pan_angle.toFixed(1);
                             this.myTilt = TrData.tilt_angle.toFixed(1);
+                            this.tr_offset_alt = TrData.offset_alt.toFixed(1);
 
                             this.tr_state = TrData.state.toString();
                             if (this.tr_state === 'arranging') {
