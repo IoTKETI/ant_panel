@@ -1468,11 +1468,11 @@ export default {
     watch: {
         motorSpeed(nVal) {
             this.tr_speed = nVal;
-            this.speedCount = parseInt(nVal / 8.88);
+            this.speedCount = Math.round(nVal / 8.88);
             this.mSpeedMsg = this.speedCount.toString() + 'x';
         },
         tr_speed(nVal) {
-            this.speedCount = parseInt(nVal / 8.88);
+            this.speedCount = Math.round(nVal / 8.88);
             this.mSpeedMsg = this.speedCount.toString() + 'x';
         }
     },
