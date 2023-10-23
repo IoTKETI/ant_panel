@@ -341,12 +341,12 @@
                 <v-col>
                     <v-card class="v1" outlined color="transparent">
                         <br/>
-                        <v-row class="mt-2">
+                        <v-row class="">
                             <v-row>
-                                <p class="f1aa mt-n5 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
+                                <p class="f1aa mt-n6 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
                                     Antenna Type :
                                 </p>
-                                <p class="f1aa-1 mt-n2 font-weight-black" style="font-size: 15px">
+                                <p class="f1aa-1 mt-n4 font-weight-black" style="font-size: 15px">
                                     {{ ant_type }}
                                 </p>
                             </v-row>
@@ -354,8 +354,16 @@
                                 <p class="f1aa mt-n3 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
                                     Motor Speed :
                                 </p>
-                                <p class="f1aa-1 mt-n2 font-weight-black" style="font-size: 15px">
+                                <p class="f1aa-1 mt-n4 font-weight-black" style="font-size: 15px">
                                     {{ motorSpeed }}
+                                </p>
+                            </v-row>
+                            <v-row>
+                                <p class="f1aa mt-n3 font-weight-black" style="font-size: 15px; letter-spacing: 4px">
+                                    Offset Alt :
+                                </p>
+                                <p class="f1aa-1 mt-n4 font-weight-black" style="font-size: 15px">
+                                    {{ tr_offset_alt }}m
                                 </p>
                             </v-row>
                             <!--                            <v-row>-->
@@ -368,16 +376,15 @@
                             <!--                                    class="text-white mt-n8 mb-n7"-->
                             <!--                                    label=""-->
                             <!--                                    color="white"-->
-                            <!--                                    v-model="tr_altitude"-->
-                            <!--                                    :rules="tr_altitude_rule"-->
+                            <!--                                    v-model="tr_offset_alt"-->
+                            <!--                                    :rules="tr_offset_alt_rule"-->
                             <!--                                >-->
                             <!--                                </v-text-field>-->
                             <!--                            </v-row>-->
                         </v-row>
 
-                        <br/>
                         <p></p>
-                        <v-row class="justify-end pr-3 mt-n4" justify="space-between">
+                        <v-row class="justify-end pr-3 mt-n3" justify="space-between">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
@@ -514,7 +521,7 @@
                         </v-row>
                         <v-row no-gutters align="center" justify="center" style="height: 60px">
                             <p class="f1aa font-weight-black text-end" style="font-size: 15px">
-                                ALTITUDE :
+                                OFFSET ALT :
                             </p>
                         </v-row>
                         <v-spacer/>
@@ -544,27 +551,48 @@
                                         :disabled="!client.connected"
                                         v-bind="attrs"
                                         v-on="on">
-                                        <strong class="bt1">{{ antTypeMsg }}</strong>
+                                        <strong class="bt1">{{ antTypeMsg }}<v-icon>$reload</v-icon></strong>
                                     </v-btn>
                                 </template>
-                                Change antenna type to {{ antTypeMsg }}
+                                Change antenna type to "{{ antTypeMsg }}"
                             </v-tooltip>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
-                            <v-col cols="6">
+                            <v-col cols="7">
                                 <v-text-field
-                                    class="text-white"
+                                    class="text-white mr-2 centered-input"
                                     label=""
                                     color="white"
-                                    v-model="tr_altitude"
-                                    :rules="tr_altitude_rule"
+                                    v-model="offset_alt"
+                                    :rules="offset_alt_rule"
                                 >
                                 </v-text-field>
                             </v-col>
-                            <v-col cols="3">
-                                <p class="font-weight-black mt-4" style="font-size: 13px">
-                                    &nbsp;m
+                            <v-col cols="1">
+                                <p class="font-weight-black mt-3 ml-n4" style="font-size: 13px">
+                                    m
                                 </p>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            class="z1"
+                                            color="white"
+                                            outlined
+                                            raised
+                                            elevation="2"
+                                            @click="changeOffsetAlt"
+                                            :disabled="!client.connected"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            style="text-transform: unset"
+                                        >
+                                            <v-icon>$forward</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    오프셋 고도를 {{ offset_alt}}로 변경
+                                </v-tooltip>
                             </v-col>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
@@ -612,14 +640,14 @@
                         <v-row no-gutters align="center" justify="center">
                             <v-col cols="8">
                                 <v-text-field
-                                    class="text-white"
+                                    class="centered-input text-white mr-2"
                                     label=""
                                     color="white"
                                     v-model="tr_speed"
                                 >
                                 </v-text-field>
                             </v-col>
-                            <v-col>
+                            <v-col cols="4">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-btn
@@ -917,8 +945,8 @@ export default {
             droneTopic: "/Mobius/GcsName/Drinfo_Data/Panel",
 
             curAlt: 0,
-            tr_altitude: null,
-            tr_altitude_rule: [
+            offset_alt: 0.5,
+            offset_alt_rule: [
                 v => /^[.0-9]*$/.test(v) || 'Only numbers.'
             ],
 
@@ -936,6 +964,7 @@ export default {
 
             mavlink_connect: false,
 
+            tr_offset_alt: 0.5,
             motorSpeed: 0,
             tr_speed: 8.88,
             speedCount: 1,
@@ -1021,29 +1050,15 @@ export default {
 
             this.doPublish(this.speedTopic, this.tr_speed.toString());
         },
+        changeOffsetAlt() {
+            this.doPublish(this.altTopic, this.offset_alt);
+        },
         holdGPS() {
-            if (this.tr_altitude) {
-                console.log('Hold GPS\n', 'Tracker Altitude -', this.tr_altitude + 'm');
-
-                this.doPublish(this.gpsControlTopic, "hold," + this.tr_altitude);
-                this.text = '고도를 ' + this.tr_altitude + 'm로 고정합니다.';
-            }
-            else {
-                console.log('Hold GPS\n', 'Tracker Altitude is null');
-
-                this.doPublish(this.gpsControlTopic, "hold," + this.curAlt);
-                this.text = '현재 고도(' + this.curAlt + 'm)로 고정합니다.';
-            }
-            this.snackbar = true;
-            this.gps_update = true;
-            setTimeout(() => {
-                this.snackbar = false;
-            }, 3000);
+            this.doPublish(this.gpsControlTopic, "hold");
         },
         releaseGPS() {
             console.log('Release GPS');
             this.doPublish(this.gpsControlTopic, "release");
-            this.gps_update = false;
             this.text = 'GPS 고정을 해제합니다.';
 
             this.snackbar = true;
@@ -1255,7 +1270,7 @@ export default {
                     this.tr_run_status = false;
                     this.tr_arrange_status = false;
                     this.curAlt = 0;
-                    this.tr_altitude = 0;
+                    this.offset_alt = 0;
                     this.tr_state = 'ready';
                     this.gps_update = 'RELEASE';
                     this.ant_type = "T0";
@@ -1651,5 +1666,9 @@ export default {
 
 .v-text-field input {
     font-size: 15px;
+}
+
+.centered-input input {
+    text-align: end
 }
 </style>

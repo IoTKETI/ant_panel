@@ -60,7 +60,9 @@ const Icons = {
         accessPoint: 'mdi-access-point',
         selectAll: 'mdi-select-all',
         clipboardeditoutline: 'mdi-clipboard-edit-outline',
-        progressUpload: 'mdi-progress-upload'
+        progressUpload: 'mdi-progress-upload',
+        forward: 'mdi-forward',
+        reload: 'mdi-reload'
     }
 }
 
