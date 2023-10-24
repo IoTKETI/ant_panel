@@ -1109,13 +1109,12 @@ export default {
                         if (topic_arr[3] === "Tr_Data") {
                             console.log(message.toString())
                             let TrData = JSON.parse(message.toString());
-                            if (this.gps_update) {
-                                this.curAlt = TrData.alt.toFixed(2);
-                            }
 
                             this.myPan = TrData.pan_angle.toFixed(1);
                             this.myTilt = TrData.tilt_angle.toFixed(1);
+
                             this.tr_offset_alt = TrData.offset_alt.toFixed(1);
+                            this.curAlt = TrData.alt.toFixed(2);
 
                             this.tr_state = TrData.state.toString();
                             if (this.tr_state === 'arranging') {
