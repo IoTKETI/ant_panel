@@ -214,7 +214,7 @@
                                     <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_fixed }}</p>
                                 </v-row>
                                 <v-row class="mt-n3">
-                                    <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update }}</p>
+                                    <p class="f2 font-weight-black" style="letter-spacing:2px">{{ gps_update_msg }}</p>
                                 </v-row>
                             </v-col>
                         </v-row>
@@ -545,9 +545,7 @@
                                     x-large
                                     outlined
                                     raised
-                                    elevation="2"
-                                    @click="changeAntType"
-                                    :disabled="!client.connected">
+                                    elevation="2">
                                     <strong class="bt1">{{ antTypeMsg }}</strong>
                                 </v-btn>
                             </v-col>
@@ -613,42 +611,21 @@
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
-                                        v-if="gps_update === 'RELEASE'"
                                         class="z1"
                                         color="white"
                                         x-large
                                         outlined
                                         raised
                                         elevation="2"
-                                        @click="holdGPS"
+                                        @click="GPS_hold_release"
                                         :disabled="!client.connected"
                                         v-bind="attrs"
                                         v-on="on"
                                     >
-                                        <strong class="bt1">HOLD</strong>
+                                        <strong class="bt1">{{ set_gps_update_msg }}</strong>
                                     </v-btn>
                                 </template>
-                                Change to GPS Hold
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn
-                                        v-if="gps_update === 'HOLD'"
-                                        class="z1"
-                                        color="white"
-                                        x-large
-                                        outlined
-                                        raised
-                                        elevation="2"
-                                        @click="releaseGPS"
-                                        :disabled="!client.connected"
-                                        v-bind="attrs"
-                                        v-on="on"
-                                    >
-                                        <strong class="bt1">Release</strong>
-                                    </v-btn>
-                                </template>
-                                Change to GPS Release
+                                Change to GPS {{ set_gps_update_msg }}
                             </v-tooltip>
                         </v-row>
                         <v-row no-gutters align="center" justify="center">
@@ -969,7 +946,9 @@ export default {
             timeout: 3000,
 
             tr_state: 'ready',
-            gps_update: 'RELEASE',
+            gps_update: false,
+            gps_update_msg: 'RELEASE',
+            set_gps_update_msg: 'HOLD',
             ant_type: "T0",
             gps_fixed: "No GPS",
 
@@ -1065,20 +1044,15 @@ export default {
             this.doPublish(this.speedTopic, this.tr_speed.toString());
         },
         changeOffsetAlt() {
-            this.doPublish(this.altTopic, this.offset_alt);
+            this.doPublish(this.altTopic, this.offset_alt.toString());
         },
-        holdGPS() {
-            this.doPublish(this.gpsControlTopic, "hold");
-        },
-        releaseGPS() {
-            console.log('Release GPS');
-            this.doPublish(this.gpsControlTopic, "release");
-            this.text = 'GPS 고정을 해제합니다.';
-
-            this.snackbar = true;
-            setTimeout(() => {
-                this.snackbar = false;
-            }, 3000);
+        GPS_hold_release() {
+            if (this.gps_update) {
+                this.doPublish(this.gpsControlTopic, "hold");
+            }
+            else {
+                this.doPublish(this.gpsControlTopic, "release");
+            }
         },
         createConnection() {
             if (this.client.connected) {
@@ -1092,6 +1066,7 @@ export default {
                 this.getDataTopic.pantilt = "/Mobius/" + this.connection.gcs + "/Tr_Data/" + this.connection.drone + "/pantilt";
 
                 this.offsetTopic = "/Mobius/" + this.connection.gcs + "/Offset_Data/" + this.connection.drone + "/Panel";
+                this.gpsControlTopic = "/Mobius/" + this.connection.gcs + "/Gps_Ctrl_Data/" + this.connection.drone + "/Panel";
 
                 this.motorControlTopic = "/Mobius/" + this.connection.gcs + "/Ctrl_Data/" + this.connection.drone + "/Panel";
                 this.altTopic = "/Mobius/" + this.connection.gcs + "/Alt_Data/" + this.connection.drone + "/Panel";
@@ -1134,8 +1109,8 @@ export default {
                         if (topic_arr[3] === "Tr_Data") {
                             console.log(message.toString())
                             let TrData = JSON.parse(message.toString());
-                            if (this.gps_update === "RELEASE") {
-                                this.curAlt = TrData.alt;
+                            if (this.gps_update) {
+                                this.curAlt = TrData.alt.toFixed(2);
                             }
 
                             this.myPan = TrData.pan_angle.toFixed(1);
@@ -1162,11 +1137,15 @@ export default {
                             if (this.motorSpeed !== motor_speed) {
                                 this.motorSpeed = motor_speed;
                             }
-                            if (JSON.parse(TrData.gps_update.toString())) {
-                                this.gps_update = 'RELEASE';
+
+                            this.gps_update = JSON.parse(TrData.gps_update.toString());
+                            if (this.gps_update) {
+                                this.gps_update_msg = 'RELEASE';
+                                this.set_gps_update_msg = 'HOLD';
                             }
                             else {
-                                this.gps_update = "HOLD";
+                                this.gps_update_msg = "HOLD";
+                                this.set_gps_update_msg = "RELEASE";
                             }
 
                             let fix_type = parseInt(TrData.fix_type);
@@ -1287,7 +1266,8 @@ export default {
                     this.curAlt = 0;
                     this.offset_alt = 0;
                     this.tr_state = 'ready';
-                    this.gps_update = 'RELEASE';
+                    this.gps_update = false;
+                    this.gps_update_msg = 'RELEASE';
                     this.ant_type = "T0";
                     this.gps_fixed = "No GPS";
                     this.myPan = 0;
