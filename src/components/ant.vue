@@ -920,7 +920,7 @@ export default {
                 username: "keti_muv",
                 password: "keti_muv",
             },
-            getDroneDataTopic: "/Mobius/GcsName/Drone_Data/DroneName/Panel",
+            getDroneDataTopic: "/Mobius/GcsName/Tr_Mav_Data/DroneName/Panel",
             TrCmdDataTopic: "/Mobius/GcsName/TrCmd_Data/DroneName/Panel",
 
             getDataTopic: {
@@ -1331,7 +1331,7 @@ export default {
                 this.tr_client.loading = true;
                 this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
 
-                this.getDroneDataTopic = "/Mobius/" + this.connection.gcs + "/Drone_Data/" + this.connection.drone + "/Panel";
+                this.getDroneDataTopic = "/Mobius/" + this.connection.gcs + "/Tr_Mav_Data/" + this.connection.drone + "/Panel";
                 this.TrCmdDataTopic = "/Mobius/" + this.connection.gcs + "/TrCmd_Data/" + this.connection.drone + "/Panel";
 
                 console.log("Tracker host is : " + this.connection.host);
