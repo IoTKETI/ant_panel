@@ -466,7 +466,7 @@
                 v-model="snackbar"
                 :timeout="timeout"
                 :value="true"
-                color="rgb(53,53,53)"
+                :color=color
             >
                 {{ text }}
             </v-snackbar>
@@ -920,7 +920,7 @@ export default {
                 username: "keti_muv",
                 password: "keti_muv",
             },
-            getDroneDataTopic: "/Mobius/GcsName/Drone_Data/DroneName/Panel",
+            getDroneDataTopic: "/Mobius/GcsName/Tr_Mav_Data/DroneName/Panel",
             TrCmdDataTopic: "/Mobius/GcsName/TrCmd_Data/DroneName/Panel",
 
             getDataTopic: {
@@ -944,6 +944,7 @@ export default {
             snackbar: false,
             text: '',
             timeout: 3000,
+            color: "rgb(53,53,53)",
 
             tr_state: 'ready',
             gps_update: false,
@@ -970,6 +971,7 @@ export default {
             dr_info_dialog: false,
 
             mavUdpComLink: {},
+            tr_mavlink_tId: null
         };
     },
     methods: {
@@ -1008,11 +1010,6 @@ export default {
         },
         doArrange() {
             this.doPublish(this.motorControlTopic, "arrange");
-        },
-        doSetOffset() {
-            this.doPublish(this.offsetTopic, JSON.stringify({
-                p_offset: -1 * (this.p_offset), t_offset: -1 * (this.t_offset)
-            }));
         },
         changeAntType() {
             this.antTypeFlag = !this.antTypeFlag;
@@ -1295,6 +1292,7 @@ export default {
             else {
                 if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, this.connection.drone)) {
                     this.mavUdpComLink[this.connection.drone].socket.close();
+                    delete this.mavUdpComLink[this.connection.drone];
                 }
                 this.tr_destroyConnection();
             }
@@ -1316,7 +1314,7 @@ export default {
                 });
 
                 udpSocket.on('close', () => {
-                    console.log('close');
+                    console.log('UDP socket closed on port ' + port + ' [' + dName + ']');
 
                     if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, this.id)) {
                         delete this.mavUdpComLink[this.id];
@@ -1333,70 +1331,74 @@ export default {
                 this.tr_client.loading = true;
                 this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
 
-                this.getDroneDataTopic = "/Mobius/" + this.connection.gcs + "/Drone_Data/" + this.connection.drone + "/Panel";
+                this.getDroneDataTopic = "/Mobius/" + this.connection.gcs + "/Tr_Mav_Data/" + this.connection.drone + "/Panel";
                 this.TrCmdDataTopic = "/Mobius/" + this.connection.gcs + "/TrCmd_Data/" + this.connection.drone + "/Panel";
 
                 console.log("Tracker host is : " + this.connection.host);
-                if (this.connection.host.includes('192.168.')) {
-                    this.createUdpCommLink(this.connection.drone, 11000 + 254);
+                this.createUdpCommLink(this.connection.drone, 11254);
 
-                    const {host, port, endpoint, ...options} = this.tr_connection;
-                    const connectUrl = `ws://${host}:${port}${endpoint}`;
-                    try {
-                        this.tr_client = mqtt.connect(connectUrl, options);
+                const {host, port, endpoint, ...options} = this.tr_connection;
+                const connectUrl = `ws://${host}:${port}${endpoint}`;
+                try {
+                    this.tr_client = mqtt.connect(connectUrl, options);
 
-                        this.tr_client.on("connect", () => {
-                            console.log(connectUrl, "Connection succeeded!");
+                    this.tr_client.on("connect", () => {
+                        console.log(connectUrl, "Connection succeeded!");
 
-                            this.tr_client.connected = true;
-                            this.tr_client.loading = false;
+                        this.tr_client.connected = true;
+                        this.tr_client.loading = false;
 
-                            this.tr_doSubscribe(this.getDroneDataTopic);
-                        });
+                        this.tr_doSubscribe(this.getDroneDataTopic);
 
-                        this.tr_client.on("error", (error) => {
-                            console.log("tr_Connection failed", error);
+                        if (!this.tr_mavlink_tId) {
+                            this.tr_mavlink_tId = setTimeout(() => {
+                                this.text = '이더넷 케이블을 통해 트래커와 연결하세요.';
+                                this.snackbar = true;
+                                this.color = 'error';
+                                this.timeout = 3000;
 
-                            this.tr_destroyConnection();
-                        });
+                                this.connectMAVLink()
+                            }, 2000)
+                        }
+                    });
 
-                        this.tr_client.on("close", () => {
-                            console.log("tr_Connection closed");
+                    this.tr_client.on("error", (error) => {
+                        console.log("tr_Connection failed", error);
 
-                            this.tr_destroyConnection();
+                        this.tr_destroyConnection();
+                    });
 
-                            this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
-                        });
+                    this.tr_client.on("close", () => {
+                        console.log("tr_Connection closed");
 
-                        this.tr_client.on("message", (topic, message) => {
-                            // console.log("Received " + message.toString() + " From " + topic);
+                        this.tr_destroyConnection();
 
-                            let topic_arr = topic.split("/");
-                            if (topic_arr[3] === "Drone_Data") {
-                                if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, topic_arr[4])) {
-                                    this.mavUdpComLink[topic_arr[4]].socket.send(message, this.mavUdpComLink[topic_arr[4]].port, 'localhost', (error) => {
-                                        if (error) {
-                                            this.mavUdpComLink[topic_arr[4]].socket.close();
-                                            console.log('udpCommLink[' + topic_arr[4] + '].socket is closed');
-                                        }
-                                    });
-                                }
+                        this.tr_connection.clientId = "mqttjs_" + "tr_" + nanoid(15);
+                    });
+
+                    this.tr_client.on("message", (topic, message) => {
+                        // console.log("Received " + message.toString('hex') + " From " + topic);
+
+                        let topic_arr = topic.split("/");
+                        if (topic === this.getDroneDataTopic) {
+                            clearTimeout(this.tr_mavlink_tId);
+                            this.tr_mavlink_tId = null;
+                            if (Object.prototype.hasOwnProperty.call(this.mavUdpComLink, topic_arr[4])) {
+                                this.mavUdpComLink[topic_arr[4]].socket.send(message, this.mavUdpComLink[topic_arr[4]].port, 'localhost', (error) => {
+                                    if (error) {
+                                        this.mavUdpComLink[topic_arr[4]].socket.close();
+                                        console.log('udpCommLink[' + topic_arr[4] + '].socket is closed');
+                                    }
+                                });
                             }
-                        });
-                    }
-                    catch (error) {
-                        console.log("tr_mqtt.connect error", error);
-                        this.tr_client.connected = false;
-
-                        setTimeout(this.tr_createConnection, 2000);
-                    }
+                        }
+                    });
                 }
-                else {
-                    this.text = '트래커와 이더넷으로 연결하세요.';
-                    this.snackbar = true;
-                    setTimeout(() => {
-                        this.snackbar = false;
-                    }, 3000);
+                catch (error) {
+                    console.log("tr_mqtt.connect error", error);
+                    this.tr_client.connected = false;
+
+                    setTimeout(this.tr_createConnection, 2000);
                 }
             }
         },
@@ -1422,7 +1424,6 @@ export default {
                         console.log("tr_Publish error", error);
                     }
                 });
-                console.log('tr_publish', topic, payload)
             }
         },
 
